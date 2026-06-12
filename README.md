@@ -56,3 +56,17 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+src/
+ └── components/
+      └── AdmissionForm/
+           ├── AdmissionForm.tsx          <-- The Parent (Holds the tabs and the state)
+           ├── tabs/
+           │    ├── BasicInformationTab.tsx
+           │    ├── PaperSelectionTab.tsx
+           │    └── ...
+           └── sections/
+                ├── PersonalInfoSection.tsx
+                ├── AddressSection.tsx
+                ├── PreviousExamSection.tsx
+                └── DocumentUploadSection.tsx
