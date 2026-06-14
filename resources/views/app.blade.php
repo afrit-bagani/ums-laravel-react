@@ -6,6 +6,7 @@
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     <x-inertia::head />
+    @routes
 </head>
 
 <body>
