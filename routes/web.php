@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Student\LoginController;
 use App\Http\Controllers\WelcomeController;
@@ -13,4 +14,8 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/admin/login', [AdminLoginController::class, 'create'])->name('admin.login');
     Route::post('/admin/login', [AdminLoginController::class, 'store'])->name('admin.login.store');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/admin/dashboard', AdminDashboardController::class)->name('admin.dashboard');
 });

@@ -2,13 +2,21 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Link } from "@inertiajs/react";
 
-export function LoginForm({ className, ...props }) {
+export function LoginForm({
+    className,
+    data,
+    setData,
+    errors,
+    processing,
+    onSubmit,
+    ...props }) {
     return (
         <form
             className={cn("flex flex-col gap-6", className)}
             {...props}
-            onSubmit={submit}
+            onSubmit={onSubmit}
         >
             <FieldGroup>
                 <div className="flex flex-col items-center gap-1 text-center">
@@ -24,31 +32,39 @@ export function LoginForm({ className, ...props }) {
                     <Input
                         id="email"
                         type="email"
+                        value={data.email}
+                        onChange={(e) => setData('email', e.target.value)}
+                        className="bg-background"
                         placeholder="Enter your login credential"
                         required
-                        className="bg-background"
                     />
+                    {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
                 </Field>
                 <Field>
                     <div className="flex items-center">
                         <FieldLabel htmlFor="password">Password</FieldLabel>
-                        <a
-                            href="#"
+                        <Link
+                            href="admin/forgot-password"
                             className="ml-auto text-sm underline-offset-4 hover:underline"
                         >
                             Forgot your password?
-                        </a>
+                        </Link>
                     </div>
                     <Input
                         id="password"
                         type="password"
+                        value={data.password}
+                        onChange={e => setData('password', e.target.value)}
                         placeholder="Enter Your Password"
                         required
                         className="bg-background"
                     />
+                    {errors.password && <p className="text-sm text-destructive mt-1">{errors.password}</p>}
                 </Field>
                 <Field>
-                    <Button type="submit">Login</Button>
+                    <Button type="submit" disabled={processing}>
+                        {processing ? 'Logging in..' : 'Login'}
+                    </Button>
                 </Field>
             </FieldGroup>
         </form>
