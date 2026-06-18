@@ -1,16 +1,18 @@
 import { usePage } from "@inertiajs/react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 
-export default function AppLayout({ children }) {
+export default function FlashMessageListner() {
     const { flash } = usePage().props;
 
     useEffect(() => {
-        if (flash.message) {
+        if (flash?.message) {
             toast.success(flash.message);
         }
-        if (flash.error) {
+        if (flash?.error) {
             toast.error(flash.error);
         }
     }, [flash])
-    return <main>{children}</main>
+
+    return null;
 }

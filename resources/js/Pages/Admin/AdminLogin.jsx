@@ -5,26 +5,23 @@ import { useRoute } from "ziggy-js";
 import { Ziggy } from "@/ziggy";
 import { LoginForm } from "@/components/login-form";
 import Logo from "@/components/AppLogoIcon";
+import FlashMessageListner from "@/components/FlashMessageListner";
 
 export default function AdminLogin() {
     const { data, setData, errors, post, processing, reset } = useForm({
         email: "",
         password: "",
-        remember: false,
     });
 
     const route = useRoute(Ziggy);
-
-    useEffect(() => {
-        return () => {
-            reset('password')
-        }
-    }, [])
 
     function submit(e) {
         e.preventDefault();
         post(route("admin.login.store"));
     }
+
+    FlashMessageListner();
+
     return (
         <div className="grid min-h-svh lg:grid-cols-2">
             <div className="flex flex-col gap-4 p-6 md:p-10">

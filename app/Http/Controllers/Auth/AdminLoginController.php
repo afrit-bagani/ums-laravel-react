@@ -16,20 +16,32 @@ class AdminLoginController extends Controller
 
     public function store(Request $request)
     {
-        $fields = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+        $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
         ]);
 
-        if (Auth::attempt($fields)) {
+        $credentials = [
+            'login_identifier' => $request->email,
+            'password' => $request->password,
+        ];
+
+        if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->intended('admin.dashboard');
+            return redirect()->route('admin.dashboard')->with('message', 'Welcome back to Admin Dashboard');
         }
 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ]);
+        return back()->with('error', 'Invalid email or password.');
+    }
 
+    public function destroy(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('admin.login')->with('message', 'You have been logged out successfully.');
     }
 }
