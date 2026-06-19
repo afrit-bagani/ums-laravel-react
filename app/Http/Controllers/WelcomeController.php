@@ -19,7 +19,7 @@ class WelcomeController extends Controller
             $role = Auth::user()->role;
 
             if ($role === 'student') {
-                return redirect()->route('student.dashboard');
+                return redirect()->route('student.dashboard')->with('message', 'Welcome to Student dashboard');
             } else {
                 return redirect()->route('admin.dashboard');
             }

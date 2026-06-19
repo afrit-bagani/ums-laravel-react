@@ -2,15 +2,17 @@
 
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Auth\AdminLoginController;
-use App\Http\Controllers\Student\LoginController;
+use App\Http\Controllers\Auth\StudentLoginController;
+use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', WelcomeController::class)->name('welcome');
 
 Route::middleware('guest')->group(function () {
-    Route::get('student/login', [LoginController::class, 'create'])->name('student.login');
-    Route::post('student/login', [LoginController::class, 'store'])->name('student.login.store');
+
+    Route::get('student/login', [StudentLoginController::class, 'create'])->name('student.login');
+    Route::post('student/login', [StudentLoginController::class, 'store'])->name('student.login.store');
 
     Route::get('/admin/login', [AdminLoginController::class, 'create'])->name('admin.login');
     Route::post('/admin/login', [AdminLoginController::class, 'store'])->name('admin.login.store');
@@ -19,4 +21,9 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'can:access-admin-panel'])->group(function () {
     Route::get('/admin/dashboard', AdminDashboardController::class)->name('admin.dashboard');
     Route::post('/admin/logout', [AdminLoginController::class, 'destroy'])->name('admin.logout');
+});
+
+Route::middleware(['auth', 'can:access-student-panel'])->group(function () {
+    Route::get('/student/dashboard', StudentDashboardController::class)->name('student.dashboard');
+    Route::post('/student/logout', [StudentLoginController::class, 'destroy'])->name('student.logout');
 });
