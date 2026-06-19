@@ -16,7 +16,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/admin/login', [AdminLoginController::class, 'store'])->name('admin.login.store');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'can:access-admin-panel'])->group(function () {
     Route::get('/admin/dashboard', AdminDashboardController::class)->name('admin.dashboard');
     Route::post('/admin/logout', [AdminLoginController::class, 'destroy'])->name('admin.logout');
 });
