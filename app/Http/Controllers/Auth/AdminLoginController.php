@@ -17,12 +17,12 @@ class AdminLoginController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'email' => ['required', 'email'],
+            'login_identifier' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
         $credentials = [
-            'login_identifier' => $request->email,
+            'login_identifier' => $request->login_identifier,
             'password' => $request->password,
         ];
 
@@ -32,7 +32,7 @@ class AdminLoginController extends Controller
             return redirect()->route('admin.dashboard')->with('message', 'Welcome back to Admin Dashboard');
         }
 
-        return back()->with('error', 'Invalid email or password.');
+        return back()->withErrors('Invalid email or password.');
     }
 
     public function destroy(Request $request)

@@ -4,7 +4,6 @@ import react from "@vitejs/plugin-react";
 import laravel from "laravel-vite-plugin";
 import { bunny } from "laravel-vite-plugin/fonts";
 import { defineConfig } from "vite";
-import path from "path";
 
 export default defineConfig({
     plugins: [
@@ -23,8 +22,7 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            "@": "/resources/js",
-            "ziggy-js": path.resolve("vendor/tightenco/ziggy"),
+            "@": "/resources/js"
         },
     },
     server: {

@@ -1,19 +1,17 @@
-import { useEffect } from "react";
 import { useForm } from "@inertiajs/react";
 
 import { useRoute } from "ziggy-js";
-import { Ziggy } from "@/ziggy";
 import { LoginForm } from "@/components/login-form";
 import Logo from "@/components/AppLogoIcon";
 import FlashMessageListner from "@/components/FlashMessageListner";
 
 export default function AdminLogin() {
-    const { data, setData, errors, post, processing, reset } = useForm({
-        email: "",
+    const { data, setData, errors, post, processing } = useForm({
+        login_identifier: "",
         password: "",
     });
 
-    const route = useRoute(Ziggy);
+    const route = useRoute();
 
     function submit(e) {
         e.preventDefault();
@@ -31,6 +29,7 @@ export default function AdminLogin() {
                 <div className="flex flex-1 items-center justify-center">
                     <div className="w-full max-w-xs">
                         <LoginForm
+                            isAdmin={true}
                             data={data}
                             setData={setData}
                             errors={errors}

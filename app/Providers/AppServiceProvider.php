@@ -24,5 +24,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('access-admin-panel', function (User $user) {
             return $user->role === 'admin';
         });
+
+        Gate::define('access-student-panel', function (User $user) {
+            return $user->role === 'student';
+        });
     }
 }

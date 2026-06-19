@@ -2,8 +2,11 @@ import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Ziggy } from "@/ziggy";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
+
+globalThis.Ziggy = Ziggy;
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
