@@ -4,12 +4,11 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\StudentLoginController;
 use App\Http\Controllers\Student\StudentDashboardController;
-use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
-
-Route::get('/', WelcomeController::class)->name('welcome');
+use Inertia\Inertia;
 
 Route::middleware('guest')->group(function () {
+    Route::get('/', fn() => Inertia::render('Welcome'))->name('welcome');
 
     Route::get('student/login', [StudentLoginController::class, 'create'])->name('student.login');
     Route::post('student/login', [StudentLoginController::class, 'store'])->name('student.login.store');
