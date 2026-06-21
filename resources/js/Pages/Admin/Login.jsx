@@ -5,7 +5,7 @@ import { LoginForm } from "@/components/login-form";
 import Logo from "@/components/AppLogoIcon";
 import FlashMessageListner from "@/components/FlashMessageListner";
 
-export default function AdminLogin() {
+export default function Login() {
     const { data, setData, errors, post, processing } = useForm({
         login_identifier: "",
         password: "",

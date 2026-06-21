@@ -4,7 +4,7 @@ import FlashMessageListner from "@/components/FlashMessageListner";
 import { Button } from "@/components/ui/button";
 import AdminDashboardLayout from "@/Pages/Layouts/Admin/AdminDashboardLayout";
 
-export default function AdminDashboard() {
+export default function Dashboard() {
 
     const route = useRoute();
 
@@ -20,7 +20,7 @@ export default function AdminDashboard() {
     )
 }
 
-AdminDashboard.layout = (page) => {
+Dashboard.layout = (page) => {
     return (
         <AdminDashboardLayout showSidebar={true}>
             {page}

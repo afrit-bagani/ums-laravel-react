@@ -11,7 +11,7 @@ class AdminLoginController extends Controller
 {
     public function create()
     {
-        return Inertia::render('Admin/AdminLogin');
+        return Inertia::render('Admin/Login');
     }
 
     public function store(Request $request)

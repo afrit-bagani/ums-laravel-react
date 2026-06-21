@@ -13,6 +13,6 @@ class AdminDashboardController extends Controller
      */
     public function __invoke(Request $request)
     {
-        return Inertia::render('Admin/AdminDashboard');
+        return Inertia::render('Admin/Dashboard');
     }
 }
