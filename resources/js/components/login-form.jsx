@@ -82,7 +82,6 @@ export function LoginForm({
                         className="bg-background"
                     />
                 </Field>
-                {errors.error && <Alert variant="destructive" title="Login Error" description={errors.error} />}
                 <Field>
                     <Button type="submit" disabled={processing}>
                         {processing ? 'Logging in..' : 'Login'}
