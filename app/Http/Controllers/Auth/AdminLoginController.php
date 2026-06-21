@@ -39,7 +39,7 @@ class AdminLoginController extends Controller
 
             if ($user && $user->role === 'admin') {
                 $request->session()->regenerate();
-                return redirect()->route('admin.dashboard')->with('message', 'Welcome back to Admin Dashboard');
+                return redirect()->route('admin.batches')->with('message', 'Welcome back to Admin Dashboard');
             }
             Auth::logout();
         }

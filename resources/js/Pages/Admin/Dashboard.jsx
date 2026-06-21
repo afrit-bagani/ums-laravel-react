@@ -13,9 +13,7 @@ export default function Dashboard() {
     return (
         <>
             <h1>Admin Dashboard</h1>
-            <Button variant="destructive" asChild>
-                <Link href={route('admin.logout')} method="post" as="button">Logout</Link>
-            </Button>
+
         </>
     )
 }

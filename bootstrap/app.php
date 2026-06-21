@@ -20,7 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->redirectUsersTo(function (Request $request) {
             if (Auth::user()->role === 'admin') {
-                return route('admin.dashboard');
+                return route('admin.batches');
             }
             return route('student.dashboard');
         });
