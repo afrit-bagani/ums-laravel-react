@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Batch;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreBatchRequest;
 use App\Http\Requests\UpdateBatchRequest;
-use Illuminate\Support\Facades\DB;
-use Inertia\Inertia;
-use App\Http\Controllers\Controller;
+use App\Models\Batch;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-
-use function Laravel\Prompts\search;
+use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class BatchController extends Controller
 {
@@ -20,7 +18,7 @@ class BatchController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = $request->query('per-page', 10);
+        $perPage = $request->query('rows-per-page', 10);
         $currentPage = $request->query('page', 1);
         $offset = ($currentPage - 1) * $perPage;
 
@@ -31,7 +29,7 @@ class BatchController extends Controller
         $bindings = [];
 
         // search filter
-        if (!empty($search)) {
+        if (! empty($search)) {
             $whereClauses[] = '(code LIKE ? OR name LIKE ?)';
             $bindings[] = "%{$search}%";
             $bindings[] = "%{$search}%";
@@ -45,7 +43,7 @@ class BatchController extends Controller
 
         $query = '';
         if (count($whereClauses) > 0) {
-            $query = 'WHERE ' . implode(' AND ', $whereClauses); // final query string
+            $query = 'WHERE '.implode(' AND ', $whereClauses); // final query string
         }
 
         $dataBindings = array_merge($bindings, [$perPage, $offset]);
@@ -67,8 +65,6 @@ class BatchController extends Controller
             $currentPage,
             ['path' => $request->url(), 'query' => $request->query()]
         );
-
-        dd($paginator);
 
         return Inertia::render('Admin/Batches/Index', [
             'batches' => $paginator,
@@ -123,4 +119,6 @@ class BatchController extends Controller
     {
         //
     }
+
+    public function bulkStatus() {}
 }

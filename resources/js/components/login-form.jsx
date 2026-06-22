@@ -4,8 +4,6 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Link } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
-import { Alert } from "@/components/Alert";
-
 
 export function LoginForm({
     className,

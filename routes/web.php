@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::middleware('guest')->group(function () {
-    Route::get('/', fn() => Inertia::render('Welcome'))->name('welcome');
+    Route::get('/', fn () => Inertia::render('Welcome'))->name('welcome');
 
     Route::get('student/login', [StudentLoginController::class, 'create'])->name('student.login');
     Route::post('student/login', [StudentLoginController::class, 'store'])->name('student.login.store');
@@ -18,7 +18,8 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware(['auth', 'can:access-admin-panel'])->group(function () {
-    Route::get('/admin/batches', [BatchController::class, 'index'])->name('admin.batches');
+    Route::get('/admin/batches', [BatchController::class, 'index'])->name('admin.batches.index');
+    Route::get('/admin/batches', [BatchController::class, 'index'])->name('admin.batches.bulk-status');
     Route::post('/admin/logout', [AdminLoginController::class, 'destroy'])->name('admin.logout');
 });
 
