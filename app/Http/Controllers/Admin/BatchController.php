@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreBatchRequest;
-use App\Http\Requests\UpdateBatchRequest;
 use App\Models\Batch;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class BatchController extends Controller
@@ -18,12 +17,20 @@ class BatchController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = $request->query('rows-per-page', 10);
-        $currentPage = $request->query('page', 1);
-        $offset = ($currentPage - 1) * $perPage;
+
+        $request->validate([
+            'search' => ['nullable', 'string', 'max:255'],
+            'status' => ['required', Rule::in(['active', 'inactive', 'all'])],
+            'page' => ['nullable', 'integer'],
+            'rows-per-page' => ['nullable', 'integer'],
+        ]);
 
         $search = $request->query('search');
         $status = $request->query('status');
+        $currentPage = $request->query('page', 1);
+        $perPage = $request->query('rows-per-page', 10);
+
+        $offset = ($currentPage - 1) * $perPage;
 
         $whereClauses = [];
         $bindings = [];
@@ -73,19 +80,19 @@ class BatchController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreBatchRequest $request)
+    public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'code' => ['required', 'string', 'max:255', 'unique:batch_master,code'],
+            'name' => ['required', 'string', 'max:255'],
+            'status' => ['required', Rule::in(['active', 'inactive'])],
+        ]);
+
+        Batch::create($validated);
+
+        return back()->with('success', 'Batch created successfully.');
     }
 
     /**
@@ -107,7 +114,7 @@ class BatchController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateBatchRequest $request, Batch $batch)
+    public function update(Request $request, Batch $batch)
     {
         //
     }

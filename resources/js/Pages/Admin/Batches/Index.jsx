@@ -4,14 +4,13 @@ import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { useRoute } from 'ziggy-js';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Edit, Filter, Plus, RefreshCw, Search } from 'lucide-react';
-import CreateBatchModal from './CreateBatchModal';
+import CreateBatchDialog from './CreateBatchDialog';
 
 export default function Batches({ batches, filters }) {
     const route = useRoute();
-    const { component } = usePage();
 
     const activeSearch = filters?.search || '';
-    const activeStatus = filters?.status || 'All';
+    const activeStatus = filters?.status || 'all';
 
     // ------------------------------------------------------------------------
     // FILTER & SEARCH FORM
@@ -27,7 +26,7 @@ export default function Batches({ batches, filters }) {
     }
 
     const handleClearFilters = () => {
-        filterForm.setData({ search: '', status: 'All' });
+        filterForm.setData({ search: '', status: 'all' });
         router.get(route('admin.batches.index'), {}, { preserveState: true, preserveScroll: true });
     }
 
@@ -74,19 +73,6 @@ export default function Batches({ batches, filters }) {
         })
     }
 
-    const [isCreateBatchModalOpen, setIsCreateBatchModalOpen] = useState(false);
-
-    const createBatchForm = useForm({
-        code: '',
-        name: '',
-        status: ''
-    })
-
-    function handleNewBatch(e, post) {
-        e.preventDefault();
-        createBatchForm.post(route('admin.batches.store'))
-    }
-
     return (
         <>
             <Head title="Manage Batches" />
@@ -98,18 +84,14 @@ export default function Batches({ batches, filters }) {
                         <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">Manage Batches</h1>
                         <p className="text-sm text-gray-500 mt-1">Configure student batches names and codes </p>
                     </div>
-                    <button
-                        onClick={() => setIsCreateBatchModalOpen(true)}
-                        className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium shadow-sm transition-all">
-                        <Plus className="w-4 h-4" /> New Batch
-                    </button>
+                    <CreateBatchDialog />
                 </div>
 
                 <div className='space-y-6'>
 
                     {/* FILTER PANEL */}
                     <div className="bg-white rounded-2xl border border-gray-200 p-2 shadow-sm flex flex-col lg:flex-row items-center justify-between">
-                        <form onSubmit={handleFilterSubmit} className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto flex-1">
+                        <form onSubmit={handleFilterSubmit} className="flex flex-col sm:flex-row gap-2 w-full flex-1">
                             <div className="relative flex-1 lg:max-w-md group">
                                 <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                                 <input
@@ -120,27 +102,29 @@ export default function Batches({ batches, filters }) {
                                     className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white border focus:border-indigo-500/30 rounded-xl focus:ring-4 focus:ring-indigo-500/10 text-sm outline-none"
                                 />
                             </div>
-                            <div className="relative w-full sm:w-48">
-                                <Filter className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                                <select
-                                    value={filterForm.data.status}
-                                    onChange={(e) => filterForm.setData('status', e.target.value)}
-                                    className="w-full pl-10 pr-8 py-2.5 bg-gray-50 border-transparent focus:bg-white border focus:border-indigo-500/30 rounded-xl focus:ring-4 focus:ring-indigo-500/10 text-sm outline-none appearance-none"
-                                >
-                                    <option value="All">All Statuses</option>
-                                    <option value="active">Active Only</option>
-                                    <option value="inactive">Inactive Only</option>
-                                </select>
-                            </div>
-                            <div className="flex gap-2">
-                                <button type="submit" disabled={filterForm.processing} className="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-xl disabled:opacity-50">
-                                    {filterForm.processing ? 'Searching ...' : 'Search'}
-                                </button>
-                                {(activeSearch || activeStatus !== 'All') && (
-                                    <button type="button" onClick={handleClearFilters} className="px-4 py-2.5 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium rounded-xl">
-                                        Clear
+                            <div className='flex flex-col sm:flex-row gap-2 sm:ml-auto w-full sm:w-auto'>
+                                <div className="relative w-full sm:w-48">
+                                    <Filter className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                    <select
+                                        value={filterForm.data.status}
+                                        onChange={(e) => filterForm.setData('status', e.target.value)}
+                                        className="w-full pl-10 pr-8 py-2.5 bg-gray-50 border-transparent focus:bg-white border focus:border-indigo-500/30 rounded-xl focus:ring-4 focus:ring-indigo-500/10 text-sm outline-none appearance-none"
+                                    >
+                                        <option value="all">All Statuses</option>
+                                        <option value="active">Active Only</option>
+                                        <option value="inactive">Inactive Only</option>
+                                    </select>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button type="submit" disabled={filterForm.processing} className="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-xl disabled:opacity-50">
+                                        {filterForm.processing ? 'Searching ...' : 'Search'}
                                     </button>
-                                )}
+                                    {(activeSearch || activeStatus !== 'all') && (
+                                        <button type="button" onClick={handleClearFilters} className="px-4 py-2.5 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium rounded-xl">
+                                            Clear
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -303,14 +287,6 @@ export default function Batches({ batches, filters }) {
                     </div>
                 </div>
             </div>
-
-            {isCreateBatchModalOpen && (
-                <CreateBatchModal
-                    setIsCreateBatchModalOpen={setIsCreateBatchModalOpen}
-                    onSubmit={handleNewBatch}
-                    createForm={createBatchForm}
-                />
-            )}
         </>
     );
 }

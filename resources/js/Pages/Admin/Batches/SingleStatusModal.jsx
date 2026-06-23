@@ -9,8 +9,8 @@ export default function SingleStatusModal() {
                         value={statusForm.data.status} onChange={(e) => statusForm.setData('status', e.target.value)}
                         className="w-full mb-6 py-2.5 px-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 text-sm"
                     >
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
                     </select>
                     <div className="flex gap-3">
                         <button type="button" onClick={() => setIsSingleStatusModalOpen(false)} className="flex-1 py-2.5 border rounded-xl text-sm hover:bg-gray-50">Cancel</button>

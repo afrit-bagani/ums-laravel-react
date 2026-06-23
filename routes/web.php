@@ -19,7 +19,8 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware(['auth', 'can:access-admin-panel'])->group(function () {
     Route::get('/admin/batches', [BatchController::class, 'index'])->name('admin.batches.index');
-    Route::get('/admin/batches', [BatchController::class, 'index'])->name('admin.batches.bulk-status');
+    Route::post('/admin/batches', [BatchController::class, 'store'])->name('admin.batches.store');
+    Route::post('/admin/batches/bulk-status', [BatchController::class, 'bulkStatus'])->name('admin.batches.bulk-status');
     Route::post('/admin/logout', [AdminLoginController::class, 'destroy'])->name('admin.logout');
 });
 
