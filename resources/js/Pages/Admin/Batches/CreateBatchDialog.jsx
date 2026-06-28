@@ -30,7 +30,7 @@ export default function CreateBatchDialog() {
     const route = useRoute();
     const [isOpen, setIsOpen] = useState(false);
 
-    const { data, setData, errors, post, processing, reset } = useForm({
+    const { data, setData, errors, post, processing, reset, clearErrors } = useForm({
         code: '',
         name: '',
         status: 'active',
@@ -47,8 +47,17 @@ export default function CreateBatchDialog() {
         });
     }
 
+    function handleOpenChnage(open) {
+        setIsOpen(open)
+
+        if(!open){
+            clearErrors();
+            reset()
+        }
+    }
+
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog open={isOpen} onOpenChange={handleOpenChnage}>
             <DialogTrigger asChild>
                 <Button size="lg" className="p-6"><Plus className="w-4 h-4" />New Batch</Button>
             </DialogTrigger>
