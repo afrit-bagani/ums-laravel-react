@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import AdminDashboardLayout from "@/Pages/Layouts/Admin/AdminDashboardLayout";
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm, } from '@inertiajs/react';
 import { useRoute } from 'ziggy-js';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Edit, Filter, Plus, RefreshCw, Search } from 'lucide-react';
+import { Filter, Search } from 'lucide-react';
 import CreateBatchDialog from './CreateBatchDialog';
+import Pagination from '@/components/Pagination';
+import ActionRow from './ActionRow';
 
 export default function Batches({ batches, filters }) {
     const route = useRoute();
@@ -29,16 +30,6 @@ export default function Batches({ batches, filters }) {
         filterForm.setData({ search: '', status: 'all' });
         router.get(route('admin.batches.index'), {}, { preserveState: true, preserveScroll: true });
     }
-
-    // ------------------------------------------------------------------------
-    // PAGINATION HANDLER
-    // ------------------------------------------------------------------------
-    const handlePageChange = (pageNumber) => {
-        router.get(route('admin.batches.index'), {
-            ...filterForm.data,
-            page: pageNumber
-        }, { preserveState: true, preserveScroll: true });
-    };
 
     // ------------------------------------------------------------------------
     // BULK ACTION FORM $ SELECTION
@@ -190,7 +181,7 @@ export default function Batches({ batches, filters }) {
                                         </tr>
                                     ) : (
                                         batches.data.map((batch, index) => {
-                                            const globalIndex = batches.from + index;
+                                            const serialNo = batches.from + index;
 
                                             const isSelected = selectedIds.includes(batch.batch_id);
 
@@ -207,7 +198,7 @@ export default function Batches({ batches, filters }) {
                                                     </td>
 
                                                     <td className="py-4 px-6 text-center text-gray-500 font-medium">
-                                                        {globalIndex}
+                                                        {serialNo}
                                                     </td>
 
                                                     <td className="py-4 px-6">
@@ -219,23 +210,7 @@ export default function Batches({ batches, filters }) {
                                                     </td>
 
                                                     <td className="py-4 px-6">
-                                                        <div className="flex items-center gap-2">
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => openSingleStatusModal(batch)}
-                                                                className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg"
-                                                                title="Quick toggle status"
-                                                            >
-                                                                <RefreshCw className="w-4 h-4" />
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
-                                                                title="Edit batch"
-                                                            >
-                                                                <Edit className="w-4 h-4" />
-                                                            </button>
-                                                        </div>
+                                                        <ActionRow batch={batch}/>
                                                     </td>
 
                                                     <td className="py-4 px-6 font-semibold text-gray-900">{batch.code}</td>
@@ -249,41 +224,8 @@ export default function Batches({ batches, filters }) {
                             </table>
                         </div>
 
-                        {/* LARAVEL PAGINATION */}
-                        <div className="border-t border-gray-100 p-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gray-50/30">
-                            <p className="text-sm text-gray-500 font-medium">
-                                Showing <span className="text-gray-900 font-semibold">{batches.from || 0}</span> to <span className="text-gray-900 font-semibold">{batches.to || 0}</span> of <span className="text-gray-900 font-semibold">{batches.total || 0}</span> results
-                            </p>
-
-                            <div className="flex items-center gap-1 p-1 bg-gray-100/50 border border-gray-200/60 rounded-xl">
-                                <button
-                                    onClick={() => handlePageChange(batches.current_page - 1)}
-                                    disabled={batches.current_page === 1}
-                                    className="p-2 rounded-lg text-gray-500 hover:bg-white hover:text-gray-900 disabled:opacity-40 disabled:bg-transparent"
-                                >
-                                    <ChevronLeft className="w-4 h-4" />
-                                </button>
-
-                                {Array.from({ length: batches.last_page }, (_, i) => i + 1).map(page => (
-                                    <button
-                                        key={page}
-                                        onClick={() => handlePageChange(page)}
-                                        className={`w-8 h-8 flex items-center justify-center text-sm font-medium rounded-lg ${batches.current_page === page ? 'bg-white text-gray-900 shadow-sm border border-gray-200' : 'text-gray-500 hover:bg-white hover:text-gray-900'
-                                            }`}
-                                    >
-                                        {page}
-                                    </button>
-                                ))}
-
-                                <button
-                                    onClick={() => handlePageChange(batches.current_page + 1)}
-                                    disabled={batches.current_page === batches.last_page}
-                                    className="p-2 rounded-lg text-gray-500 hover:bg-white hover:text-gray-900 disabled:opacity-40 disabled:bg-transparent"
-                                >
-                                    <ChevronRight className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
+                        {/* PAGINATION */}
+                        <Pagination data={batches} />
                     </div>
                 </div>
             </div>

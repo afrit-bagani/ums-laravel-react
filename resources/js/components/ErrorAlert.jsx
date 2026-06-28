@@ -7,7 +7,7 @@ import {
 
 export function ErrorAlert({ title }) {
     return (
-        <Alert variant="destrutive" className="max-w-md">
+        <Alert variant="destructive" className="max-w-md">
             <AlertCircleIcon />
             <AlertTitle>{title}</AlertTitle>
         </Alert>

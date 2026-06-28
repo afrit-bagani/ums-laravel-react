@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Batch;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -20,7 +21,7 @@ class BatchController extends Controller
 
         $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
-            'status' => ['required', Rule::in(['active', 'inactive', 'all'])],
+            'status' => ['nullable', Rule::in(['active', 'inactive', 'all'])],
             'page' => ['nullable', 'integer'],
             'rows-per-page' => ['nullable', 'integer'],
         ]);
@@ -36,7 +37,7 @@ class BatchController extends Controller
         $bindings = [];
 
         // search filter
-        if (! empty($search)) {
+        if (!empty($search)) {
             $whereClauses[] = '(code LIKE ? OR name LIKE ?)';
             $bindings[] = "%{$search}%";
             $bindings[] = "%{$search}%";
@@ -50,13 +51,13 @@ class BatchController extends Controller
 
         $query = '';
         if (count($whereClauses) > 0) {
-            $query = 'WHERE '.implode(' AND ', $whereClauses); // final query string
+            $query = 'WHERE ' . implode(' AND ', $whereClauses); // final query string
         }
 
         $dataBindings = array_merge($bindings, [$perPage, $offset]);
 
         $batches = DB::select(
-            "SELECT * from batch_master $query LIMIT ? OFFSET ?",
+            "SELECT * from batch_master $query ORDER BY batch_id DESC LIMIT ? OFFSET ? ",
             $dataBindings
         );
 
@@ -90,25 +91,12 @@ class BatchController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        Batch::create($validated);
+        DB::insert(
+            'INSERT INTO batch_master (code, name, status, created_by, created_at, updated_at) VALUES(?,?,?,?,?,?)',
+            [$request->code, $request->name, $request->status, Auth::id(), now(), now()]
+        );
 
-        return back()->with('success', 'Batch created successfully.');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Batch $batch)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Batch $batch)
-    {
-        //
+        return back()->with('message', 'Batch created successfully.');
     }
 
     /**
@@ -116,7 +104,19 @@ class BatchController extends Controller
      */
     public function update(Request $request, Batch $batch)
     {
-        //
+        $validated = $request->validate([
+            'code' => ['required', 'string', 'max:255', 'unique:batch_master,code,' . $batch->batch_id . ',batch_id'],
+            'name' => ['required', 'string', 'max:255'],
+            'status' => ['required', Rule::in(['active', 'inactive'])],
+        ]);
+
+        $batch->update([
+            'code' => $request->code,
+            'name' => $request->name,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('admin.batches.index')->with('message', 'Batch updated successfully.');
     }
 
     /**
@@ -127,5 +127,7 @@ class BatchController extends Controller
         //
     }
 
-    public function bulkStatus() {}
+    public function bulkStatus()
+    {
+    }
 }
