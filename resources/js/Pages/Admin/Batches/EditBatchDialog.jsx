@@ -42,22 +42,26 @@ export default function EditBatchDialog({batch}) {
         patch(route('admin.batches.update', batch?.batch_id), {
             onSuccess: () => {
                 setIsOpen(false);
-                reset();
             }
         });
     }
 
-    function handleOpenChnage(open) {
+    function handleOpenChange(open) {
         setIsOpen(open)
 
         if (!open) {
             clearErrors();
-            reset()
+        } else {
+            setData({
+                code: batch?.code || '',
+                name: batch?.name || '',
+                status: batch?.status || 'active',
+            });
         }
     }
 
     return (
-        <Dialog open={isOpen} onOpenChange={handleOpenChnage}>
+        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
                  <button
                     type="button"

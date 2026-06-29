@@ -27,4 +27,4 @@ This project is a **University/College Management System (UMS)**. It handles dif
 1. **Quality over Speed:** Write proper code, no shortcuts. Ensure all code is robust, type-safe (where applicable), and follows best practices.
 2. **Maintain State:** Keep updating this `GEMINI.md` file as the project evolves.
 3. **Follow Existing Patterns:** Respect the Repository pattern and the folder structures (e.g., role-based splitting for Controllers and Pages).
-4. **Route Model Binding:** Always ensure the route parameter name exactly matches the controller variable name (e.g., `Route::patch('/batches/{batch}')` -> `update(Batch $batch)`). A mismatch will cause Laravel to silently inject an empty model with null properties, leading to dangerous DB errors or silent failures.
+4. **Raw SQL Performance:** Since the project prioritizes performance through raw SQL queries (using `DB::insert`, `DB::update`, `DB::select`), **avoid Route Model Binding** and Eloquent ORM operations where possible. Controller methods should accept primitive IDs (e.g., `public function update(Request $request, $batch_id)`) rather than type-hinting Models to prevent hidden `SELECT` queries.

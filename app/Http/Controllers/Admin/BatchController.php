@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Batch;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -37,7 +36,7 @@ class BatchController extends Controller
         $bindings = [];
 
         // search filter
-        if (!empty($search)) {
+        if (! empty($search)) {
             $whereClauses[] = '(code LIKE ? OR name LIKE ?)';
             $bindings[] = "%{$search}%";
             $bindings[] = "%{$search}%";
@@ -51,7 +50,7 @@ class BatchController extends Controller
 
         $query = '';
         if (count($whereClauses) > 0) {
-            $query = 'WHERE ' . implode(' AND ', $whereClauses); // final query string
+            $query = 'WHERE '.implode(' AND ', $whereClauses); // final query string
         }
 
         $dataBindings = array_merge($bindings, [$perPage, $offset]);
@@ -102,32 +101,56 @@ class BatchController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Batch $batch)
+    public function update(Request $request, $batch_id)
     {
-        $validated = $request->validate([
-            'code' => ['required', 'string', 'max:255', 'unique:batch_master,code,' . $batch->batch_id . ',batch_id'],
+        $request->merge(['batch_id' => $batch_id]);
+
+        $request->validate([
+            'code' => ['required', 'string', 'max:255', 'unique:batch_master,code,'.$batch_id.',batch_id'],
             'name' => ['required', 'string', 'max:255'],
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        $batch->update([
-            'code' => $request->code,
-            'name' => $request->name,
-            'status' => $request->status,
-        ]);
+        DB::update(
+            'UPDATE batch_master SET code = ?, name = ?, status = ?, updated_at = ? WHERE batch_id =?',
+            [$request->code, $request->name, $request->status, now(), $batch_id],
+        );
 
-        return redirect()->route('admin.batches.index')->with('message', 'Batch updated successfully.');
+        return back()->with('message', 'Batch updated successfully.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update status of the specified resource in storage.
      */
-    public function destroy(Batch $batch)
+    public function changeStatus(Request $request, $batch_id)
     {
-        //
+        $request->merge(['batch_id' => $batch_id]);
+
+        $request->validate([
+            'batch_id' => ['required', 'exists:batch_master,batch_id'],
+            'status' => ['required', Rule::in(['active', 'inactive'])],
+        ]);
+
+        DB::update('UPDATE batch_master set status = ?, updated_at = ? WHERE batch_id = ?',
+            [$request->status, now(), $batch_id]
+        );
+
+        return back()->with('message', 'Batch status changed successfully.');
     }
 
-    public function bulkStatus()
+    public function bulkStatus(Request $request)
     {
+        $request->validate([
+            'batch_ids' => ['required', 'array'],
+            'batch_ids.*' => ['required', 'exists:batch_master,batch_id'],
+            'status' => ['required', Rule::in(['active', 'inactive'])],
+        ]);
+
+        $placeholders = implode(',', array_fill(0, count($request->batch_ids), '?'));
+        $bindings = [$request->status, now(), ...$request->batch_ids];
+
+        DB::update("UPDATE batch_master SET status = ?, updated_at = ? WHERE batch_id IN ($placeholders)", $bindings);
+
+        return back()->with('message', 'Batch status changed successfully.');
     }
 }

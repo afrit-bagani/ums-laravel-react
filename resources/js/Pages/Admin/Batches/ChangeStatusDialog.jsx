@@ -1,4 +1,4 @@
-import { ErrorAlert } from "@/components/ErrorAlert"
+import { RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -19,81 +19,58 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Field, FieldGroup } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useForm } from "@inertiajs/react"
-import { Check, Plus } from "lucide-react"
+import {  Check, } from "lucide-react"
 import { useRoute } from "ziggy-js"
 import { useState } from "react"
 
-export default function CreateBatchDialog() {
-    const route = useRoute();
+
+export default function ChangeStatusDialog({batch}) {
+  const route = useRoute();
     const [isOpen, setIsOpen] = useState(false);
 
-    const { data, setData, errors, post, processing, reset, clearErrors } = useForm({
-        code: '',
-        name: '',
-        status: 'active',
+    const { data, setData, patch, processing} = useForm({
+        status: batch?.status || 'active',
     });
 
     function handleSubmit(e) {
         e.preventDefault();
 
-        post(route('admin.batches.store'), {
+        patch(route('admin.batches.change-status', batch?.batch_id), {
             onSuccess: () => {
                 setIsOpen(false);
-                reset();
             }
         });
     }
 
     function handleOpenChange(open) {
         setIsOpen(open)
-
-        if(!open){
-            clearErrors();
-            reset()
-        }
+        
+        setData({
+          status: batch?.status || 'active',
+        });
     }
-
-    return (
-        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+  return (
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
-                <Button size="lg" className="p-6"><Plus className="w-4 h-4" />New Batch</Button>
+                 <button
+                    type="button"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-sky-50 text-sky-700 hover:bg-sky-100 dark:bg-sky-950/50 dark:text-sky-300 dark:hover:bg-sky-900 border border-transparent hover:border-sky-200 dark:hover:border-sky-800 transition-colors"
+                    title="Change batch status"
+                >
+                    <RefreshCw className="w-3.5 h-3.5" data-icon="inline-start" /> Change Status
+                </button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-sm">
                 <DialogHeader>
-                    <DialogTitle>Create New Batch</DialogTitle>
+                    <DialogTitle>Edit Batch Status</DialogTitle>
                     <DialogDescription>
-                        Configure a new student batch. Click save when you're done.
+                        Update the status for this student batch.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>
                     <FieldGroup>
-                        <Field>
-                            <Label htmlFor="code">Batch Code</Label>
-                            <Input
-                                id="code"
-                                type="text"
-                                name="code"
-                                value={data.code}
-                                onChange={(e) => setData('code', e.target.value)}
-                                placeholder='Enter Batch code'
-                            />
-                            {errors.code && <ErrorAlert title={errors.code} />}
-                        </Field>
-                        <Field>
-                            <Label htmlFor="name">Batch Name</Label>
-                            <Input
-                                id="name"
-                                type='text'
-                                name="name"
-                                value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
-                                placeholder="Enter batch name"
-                            />
-                            {errors.name && <ErrorAlert title={errors.name} />}
-                        </Field>
                         <Field>
                             <Label htmlFor="status">Select Batch Status</Label>
                             <Select id='status'
@@ -109,7 +86,6 @@ export default function CreateBatchDialog() {
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-                            {errors.status && <ErrorAlert title={errors.status} />}
                         </Field>
                     </FieldGroup>
                     <DialogFooter className="mt-6">
@@ -121,7 +97,7 @@ export default function CreateBatchDialog() {
                             disabled={processing}>
                             {processing ? 'Saving...' : (
                                 <>
-                                    <Check className="w-4 h-4" /> Create Batch
+                                    <Check className="w-4 h-4" /> Save Changes
                                 </>)
                             }
                         </Button>
@@ -129,5 +105,5 @@ export default function CreateBatchDialog() {
                 </form>
             </DialogContent>
         </Dialog >
-    )
+  )
 }
