@@ -23,7 +23,7 @@ return new class extends Migration
             $table->decimal('practical_full_marks', 10, 2)->default(0);
             $table->decimal('practical_pass_marks', 10, 2)->default(0);
 
-            $table->foreignId('program_id')->nullable()->constrained('program_master', 'program_id')->nullOnDelete();
+            $table->foreignId('programme_id')->nullable()->constrained('programme_master', 'programme_id')->nullOnDelete();
             $table->foreignId('course_id')->nullable()->constrained('course_master', 'course_id')->nullOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users', 'id')->nullOnDelete();

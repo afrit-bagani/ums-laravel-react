@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->enum('status', ['active', 'inactive'])->default('active');
 
-            $table->foreignId('program_id')->nullable()->constrained('program_master', 'program_id')->nullOnDelete();
+            $table->foreignId('programme_id')->nullable()->constrained('programme_master', 'programme_id')->nullOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users', 'id')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users', 'id')->nullOnDelete();

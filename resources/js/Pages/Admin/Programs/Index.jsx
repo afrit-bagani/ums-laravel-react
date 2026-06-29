@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { BatchTable } from '../Batches/BatchTable';
 
 
-export default function Programs({ programs, filters }) {
+export default function Programmes({ programmes, filters }) {
     const route = useRoute();
 
     const activeSearch = filters?.search || '';
@@ -87,16 +87,16 @@ export default function Programs({ programs, filters }) {
 
     return (
         <>
-            <Head title="Manage Programs" />
+            <Head title="Manage Programmes" />
             <div className='p-4 md:p-5'>
 
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-gray-900">Manage Programs</h1>
-                        <p className="text-sm text-gray-500 mt-0.5">Configure student programs names and codes </p>
+                        <h1 className="text-2xl font-bold tracking-tight text-gray-900">Manage Programmes</h1>
+                        <p className="text-sm text-gray-500 mt-0.5">Configure student programmes names and codes </p>
                     </div>
-                    {/* <CreateProgramDialog /> */}
+                    {/* <CreateProgrammeDialog /> */}
                 </div>
 
                 <div className='space-y-4'>
@@ -193,7 +193,7 @@ export default function Programs({ programs, filters }) {
 }
 
 
-Programs.layout = (page) => {
+Programmes.layout = (page) => {
     return (
         <AdminDashboardLayout showSidebar={true}>
             {page}

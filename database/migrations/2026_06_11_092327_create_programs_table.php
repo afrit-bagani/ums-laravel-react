@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('program_master', function (Blueprint $table) {
-            $table->id('program_id');
+        Schema::create('programme_master', function (Blueprint $table) {
+            $table->id('programme_id');
             $table->string('code')->unique();
             $table->string('name');
             $table->enum('status', ['active', 'inactive'])->default('active');
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('program_master');
+        Schema::dropIfExists('programme_master');
     }
 };

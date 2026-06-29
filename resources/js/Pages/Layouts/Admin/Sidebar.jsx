@@ -21,7 +21,7 @@ export default function Sidebar() {
     const menuItems = [
         // { name: 'Dashboard', icon: LayoutDashboard, href: '/admin/dashboard' },
         { name: 'Batches', icon: Layers, href: '/admin/batches' },
-        { name: 'Programs', icon: GraduationCap, href: '/admin/programs' },
+        { name: 'Programmes', icon: GraduationCap, href: '/admin/programmes' },
         { name: 'Courses', icon: Library, href: '/admin/courses' },
         { name: 'Subjects', icon: BookOpen, href: '/admin/subjects' },
         { name: 'Students', icon: Users, href: '/admin/students' },

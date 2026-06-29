@@ -58,12 +58,12 @@ class ProgrammeController extends Controller
         $dataBindings = array_merge($bindings, [$perPage, $offset]);
 
         $batches = DB::select(
-            "SELECT * from program_master $query ORDER BY program_id DESC LIMIT ? OFFSET ? ",
+            "SELECT * from programme_master $query ORDER BY program_id DESC LIMIT ? OFFSET ? ",
             $dataBindings
         );
 
         $totalRecords = DB::selectOne(
-            "SELECT COUNT(*) as count FROM program_master $query",
+            "SELECT COUNT(*) as count FROM programme_master $query",
             $bindings
         )->count;
 
@@ -75,8 +75,8 @@ class ProgrammeController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        return Inertia::render('Admin/Programs/Index', [
-            'programs' => $paginator,
+        return Inertia::render('Admin/Programmes/Index', [
+            'programmes' => $paginator,
             'filters' => $request->only(['search', 'status']),
         ]);
     }
