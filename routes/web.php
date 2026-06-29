@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BatchController;
+use App\Http\Controllers\Admin\ProgrammeController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\StudentLoginController;
 use App\Http\Controllers\Student\StudentDashboardController;
@@ -18,11 +19,19 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware(['auth', 'can:access-admin-panel'])->group(function () {
+    // Batches
     Route::get('/admin/batches', [BatchController::class, 'index'])->name('admin.batches.index');
     Route::post('/admin/batches', [BatchController::class, 'store'])->name('admin.batches.store');
     Route::patch('/admin/batches/bulk-status', [BatchController::class, 'bulkStatus'])->name('admin.batches.bulk-status');
     Route::patch('/admin/batches/{batch_id}', [BatchController::class, 'update'])->name('admin.batches.update');
     Route::patch('/admin/batches/{batch_id}/status', [BatchController::class, 'changeStatus'])->name('admin.batches.change-status');
+
+    // Programmes
+    Route::get('/admin/programs', [ProgrammeController::class, 'index'])->name('admin.programs.index');
+    Route::post('/admin/programs', [ProgrammeController::class, 'store'])->name('admin.programs.store');
+    Route::patch('/admin/programs/bulk-status', [ProgrammeController::class, 'bulkStatus'])->name('admin.programs.bulk-status');
+    Route::patch('/admin/programs/{batch_id}', [ProgrammeController::class, 'update'])->name('admin.programs.update');
+    Route::patch('/admin/programs/{batch_id}/status', [ProgrammeController::class, 'changeStatus'])->name('admin.programs.change-status');
 
     Route::post('/admin/logout', [AdminLoginController::class, 'destroy'])->name('admin.logout');
 });
