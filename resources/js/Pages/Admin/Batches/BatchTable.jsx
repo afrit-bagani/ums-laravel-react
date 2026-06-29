@@ -12,7 +12,7 @@ import ActionRow from "./ActionRow";
 import Pagination from "@/components/Pagination";
 import { Checkbox } from "@/components/ui/checkbox";
 
-export function BatchTable({batches, selectedIds, handleSelectRow, handleSelectAll}) {
+export function BatchTable({batches, selectedIds, handleSelectRow, handleSelectAll, handlePerPageChange}) {
   const selectAll = batches.data.length > 0 && batches.data.every(b => selectedIds.has(b.batch_id));
 
   return (
@@ -77,7 +77,7 @@ export function BatchTable({batches, selectedIds, handleSelectRow, handleSelectA
         </Table>
 
       {/* PAGINATION */}
-      <Pagination data={batches} />
+      <Pagination data={batches} onPerPageChange={handlePerPageChange} />
     </div>
   )
 }

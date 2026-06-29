@@ -31,6 +31,15 @@ export default function Batches({ batches, filters }) {
         router.get(route('admin.batches.index'), {}, { preserveState: true, preserveScroll: true });
     }
 
+    const handlePerPageChange = (value) => {
+        router.get(route('admin.batches.index'), {
+            search: activeSearch,
+            status: activeStatus,
+            'rows-per-page': value,
+            page: 1
+        }, { preserveState: true, preserveScroll: true });
+    };
+
     // ------------------------------------------------------------------------
     // BULK ACTION FORM $ SELECTION
     // ------------------------------------------------------------------------
@@ -176,7 +185,7 @@ export default function Batches({ batches, filters }) {
 
 
                     {/* DATA TABLE */}
-                    <BatchTable batches={batches} selectedIds={selectedIds} handleSelectAll={handleSelectAll} handleSelectRow={handleSelectRow} />
+                    <BatchTable batches={batches} selectedIds={selectedIds} handleSelectAll={handleSelectAll} handleSelectRow={handleSelectRow} handlePerPageChange={handlePerPageChange} />
                 </div>
             </div>
         </>
