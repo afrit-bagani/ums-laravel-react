@@ -4,7 +4,7 @@ import { Head, router, useForm, } from '@inertiajs/react';
 import { useRoute } from 'ziggy-js';
 import { Filter, Search } from 'lucide-react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { BatchTable } from '../Batches/BatchTable';
+import { BatchTable } from '../Batches/components/BatchTable';
 
 
 export default function Programmes({ programmes, filters }) {

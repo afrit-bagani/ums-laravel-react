@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import AdminDashboardLayout from "@/Pages/Layouts/Admin/AdminDashboardLayout";
 import { Head, router, useForm, } from '@inertiajs/react';
 import { useRoute } from 'ziggy-js';
 import { Filter, Search } from 'lucide-react';
-import CreateBatchDialog from './CreateBatchDialog';
-import { BatchTable } from './BatchTable';
+
+import AdminDashboardLayout from "@/Pages/Layouts/Admin/AdminDashboardLayout";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+import CreateBatchDialog from './components/CreateBatchDialog';
+import { BatchTable } from './components/BatchTable';
 
 export default function Batches({ batches, filters }) {
     const route = useRoute();
