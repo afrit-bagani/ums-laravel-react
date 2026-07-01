@@ -84,7 +84,7 @@ class BatchController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'code' => ['required', 'string', 'max:255', 'unique:batch_master,code'],
             'name' => ['required', 'string', 'max:255'],
             'status' => ['required', Rule::in(['active', 'inactive'])],

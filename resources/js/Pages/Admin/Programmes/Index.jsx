@@ -4,7 +4,7 @@ import { Head, router, useForm, } from '@inertiajs/react';
 import { useRoute } from 'ziggy-js';
 import { Filter, Search } from 'lucide-react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { BatchTable } from '../Batches/components/BatchTable';
+import CreateProgrammeDialog from './components/CreateProgrammeDialog';
 
 
 export default function Programmes({ programmes, filters }) {
@@ -23,16 +23,16 @@ export default function Programmes({ programmes, filters }) {
 
     const handleFilterSubmit = (e) => {
         e.preventDefault();
-        filterForm.get(route('admin.batches.index'), { preserveState: true, preserveScroll: true });
+        filterForm.get(route('admin.programmes.index'), { preserveState: true, preserveScroll: true });
     }
 
     const handleClearFilters = () => {
         filterForm.setData({ search: '', status: 'all' });
-        router.get(route('admin.batches.index'), {}, { preserveState: true, preserveScroll: true });
+        router.get(route('admin.progeammes.index'), {}, { preserveState: true, preserveScroll: true });
     }
 
     const handlePerPageChange = (value) => {
-        router.get(route('admin.batches.index'), {
+        router.get(route('admin.programmes.index'), {
             search: activeSearch,
             status: activeStatus,
             'rows-per-page': value,
@@ -46,15 +46,15 @@ export default function Programmes({ programmes, filters }) {
     const [selectedIds, setSelectedIds] = useState(new Set());
 
     const bulkForm = useForm({
-        batch_ids: [],
+        programme_ids: [],
         status: '',
     });
 
-    useEffect(() => { bulkForm.setData('batch_ids', Array.from(selectedIds)) }, [selectedIds]);
+    useEffect(() => { bulkForm.setData('programmes_ids', Array.from(selectedIds)) }, [selectedIds]);
 
     const handleSelectAll = (checked) => {
         if (checked) {
-            setSelectedIds(new Set(batches.data.map(b => b.batch_id)));
+            setSelectedIds(new Set(programmes.data.map(programme => programme.programme_id)));
         } else {
             setSelectedIds(new Set());
         }
@@ -76,7 +76,7 @@ export default function Programmes({ programmes, filters }) {
         e.preventDefault();
         if (selectedIds.size === 0) return;
 
-        bulkForm.patch(route('admin.batches.bulk-status'), {
+        bulkForm.patch(route('admin.programmes.bulk-status'), {
             preserveScroll: true,
             onSuccess: () => {
                 setSelectedIds(new Set());
@@ -96,7 +96,7 @@ export default function Programmes({ programmes, filters }) {
                         <h1 className="text-2xl font-bold tracking-tight text-gray-900">Manage Programmes</h1>
                         <p className="text-sm text-gray-500 mt-0.5">Configure student programmes names and codes </p>
                     </div>
-                    {/* <CreateProgrammeDialog /> */}
+                    <CreateProgrammeDialog />
                 </div>
 
                 <div className='space-y-4'>

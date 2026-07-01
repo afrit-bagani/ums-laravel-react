@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreProgrammeRequest;
-use App\Http\Requests\UpdateProgrammeRequest;
+use Auth;
 use Illuminate\Http\Request;
 // use App\Models\Admin\Programme;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -82,50 +81,77 @@ class ProgrammeController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProgrammeRequest $request)
+    public function store(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'code' => ['required', 'string', 'max:255', 'unique:programme_master,code'],
+            'name' => ['required', 'string', 'max:255'],
+            'status' => ['required', Rule::in(['active', 'inactive'])],
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Programme $programme)
-    {
-        //
-    }
+        DB::insert('INSERT INTO programme_master (code, name, status, created_by, created_at, updated_at) VALUES (?,?,?,?,?,?)', [
+            $request->code, $request->name, $request->status, Auth::user()->id, now(), now(),
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Programme $programme)
-    {
-        //
+        return back()->with('message', 'Programme created successfully');
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProgrammeRequest $request, Programme $programme)
+    public function update(Request $request, $programme_id)
     {
-        //
+        $request->merge(['programme_id' => $programme_id]);
+
+        $request->validate([
+            'programme_id' => ['required', Rule::exists('programme_master', 'programme_id')],
+            'code' => ['required', 'string', 'max:255', Rule::unique('programme_master', 'code')->ignore($programme_id, 'programme_id')],
+            'name' => ['required', 'string', 'max:255'],
+            'status' => ['required', Rule::in(['active', 'inactive'])],
+        ]);
+
+        DB::update('UPDATE programme_master SET code = ? , name = ? , status = ?, updated_at = ? WHERE programme_id = ?', [
+            $request->code, $request->name, $request->status, now(), $programme_id,
+        ]);
+
+        return back()->with('message', 'Programme updated successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Programme $programme)
+    public function changeStatus(Request $request, $programme_id)
     {
-        //
+        $request->merge(['programme_id' => $programme_id]);
+
+        $request->validate([
+            'programme_id' => ['required', Rule::exists('programme_master', 'programme_id')],
+            'status' => ['required', Rule::in(['active', 'inactive'])],
+        ]);
+
+        DB::update('UPDATE programme_master SET status = ?, updated_at = ? WHERE programme_id = ?', [
+            $request->status, now(), $programme_id,
+        ]);
+
+        return back()->with('message', 'Programme status changed successfully');
+    }
+
+    public function bulkStatus(Request $request)
+    {
+        $request->validate([
+            'programme_ids' => ['required', 'array'],
+            'programme_ids.*' => ['required', 'exists:programme_master,programme_id'],
+            'status' => ['required', Rule::in(['active', 'inactive'])],
+        ]);
+
+        $placeholders = implode(',', array_fill(0, count($request->programme_ids), '?'));
+
+        DB::update("UPDATE programme_master SET status = ? , updated_at = ? WHERE programme_id IN ($placeholders)", [
+            $request->status, now(), ...$request->programme_ids,
+        ]);
+
+        return back()->with('message', 'Programme status changed successfully');
     }
 }

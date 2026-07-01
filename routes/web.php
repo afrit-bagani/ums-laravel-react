@@ -30,8 +30,8 @@ Route::middleware(['auth', 'can:access-admin-panel'])->group(function () {
     Route::get('/admin/programmes', [ProgrammeController::class, 'index'])->name('admin.programmes.index');
     Route::post('/admin/programmes', [ProgrammeController::class, 'store'])->name('admin.programmes.store');
     Route::patch('/admin/programmes/bulk-status', [ProgrammeController::class, 'bulkStatus'])->name('admin.programmes.bulk-status');
-    Route::patch('/admin/programmes/{batch_id}', [ProgrammeController::class, 'update'])->name('admin.programmes.update');
-    Route::patch('/admin/programmes/{batch_id}/status', [ProgrammeController::class, 'changeStatus'])->name('admin.programmes.change-status');
+    Route::patch('/admin/programmes/{programme_id}', [ProgrammeController::class, 'update'])->name('admin.programmes.update');
+    Route::patch('/admin/programmes/{programme_id}/status', [ProgrammeController::class, 'changeStatus'])->name('admin.programmes.change-status');
 
     Route::post('/admin/logout', [AdminLoginController::class, 'destroy'])->name('admin.logout');
 });
