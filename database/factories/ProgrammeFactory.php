@@ -18,7 +18,13 @@ class ProgrammeFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'code' => strtoupper($this->faker->unique()->lexify('???')),
+            'name' => $this->faker->words(3, true),
+            'status' => $this->faker->randomElement(['active', 'inactive']),
+            'created_by' => 1,
+            'updated_by' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

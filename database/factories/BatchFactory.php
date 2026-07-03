@@ -24,11 +24,11 @@ class BatchFactory extends Factory
         $shortEndYear = substr($endYear, -2);
 
         return [
-            'code' => strtoupper($this->faker->unique()->lexify('???')) . '-' . $this->faker->unique()->numerify('####'),
+            'code' => strtoupper($this->faker->unique()->lexify('???')).'-'.$this->faker->unique()->numerify('####'),
             'name' => "{$startYear}-{$shortEndYear}", // Generates "2022-26"
             'status' => $this->faker->randomElement(array_fill(0, 8, 'active') + array_fill(0, 2, 'inactive')),
-            'created_by' => $this->faker->numberBetween(1, 5),
-            'updated_by' => $this->faker->numberBetween(1, 5),
+            'created_by' => $this->faker->numberBetween(1, 1),
+            'updated_by' => $this->faker->numberBetween(1, 1),
             'created_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
             'updated_at' => now(),
         ];
