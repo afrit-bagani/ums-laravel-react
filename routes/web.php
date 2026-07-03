@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BatchController;
+use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\ProgrammeController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\StudentLoginController;
@@ -32,6 +33,13 @@ Route::middleware(['auth', 'can:access-admin-panel'])->group(function () {
     Route::patch('/admin/programmes/bulk-update-status', [ProgrammeController::class, 'bulkUpdateStatus'])->name('admin.programmes.bulk-update-status');
     Route::patch('/admin/programmes/{programme_id}', [ProgrammeController::class, 'update'])->name('admin.programmes.update');
     Route::patch('/admin/programmes/{programme_id}/status', [ProgrammeController::class, 'updateStatus'])->name('admin.programmes.update-status');
+
+    // Courses
+    Route::get('/admin/courses', [CourseController::class, 'index'])->name('admin.courses.index');
+    Route::post('/admin/courses', [CourseController::class, 'store'])->name('admin.courses.store');
+    Route::patch('/admin/courses/bulk-update-status', [CourseController::class, 'bulkUpdateStatus'])->name('admin.courses.bulk-update-status');
+    Route::patch('/admin/courses/{course_id}', [CourseController::class, 'update'])->name('admin.courses.update');
+    Route::patch('/admin/courses/{course_id}/status', [CourseController::class, 'updateStatus'])->name('admin.courses.update-status');
 
     Route::post('/admin/logout', [AdminLoginController::class, 'destroy'])->name('admin.logout');
 });
