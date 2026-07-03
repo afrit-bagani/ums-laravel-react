@@ -56,7 +56,7 @@ class ProgrammeController extends Controller
 
         $dataBindings = array_merge($bindings, [$perPage, $offset]);
 
-        $batches = DB::select(
+        $programmes = DB::select(
             "SELECT * from programme_master $query ORDER BY programme_id DESC LIMIT ? OFFSET ? ",
             $dataBindings
         );
@@ -67,7 +67,7 @@ class ProgrammeController extends Controller
         )->count;
 
         $paginator = new LengthAwarePaginator(
-            $batches,
+            $programmes,
             $totalRecords,
             $perPage,
             $currentPage,

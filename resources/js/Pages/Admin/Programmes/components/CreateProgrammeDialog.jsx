@@ -98,9 +98,9 @@ export default function CreateProgrammeDialog() {
           </FieldGroup>
           <DialogFooter className='mt-6'>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button type="button" variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit" disable={processing}>{processing ? 'Saving...' : <><Check className="w-4 h-4" /> Create Programme</> }</Button>
+            <Button type="submit" disabled={processing}>{processing ? 'Saving...' : <><Check className="w-4 h-4" /> Create Programme</> }</Button>
           </DialogFooter>
         </form>
       </DialogContent>

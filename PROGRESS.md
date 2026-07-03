@@ -15,3 +15,15 @@ This file tracks the ongoing features, refactoring, and UI enhancements made to 
 - **Bulletproof "Select All":** Rewrote the "Select All" checkbox logic to use `batches.data.every(b => selectedIds.has(b.batch_id))`. This prevents dangerous bugs where checking the box on Page 1 could incorrectly show as checked on Page 2 or during filtered searches.
 - **Event Handler Fixes:** Adjusted Shadcn `<Select>` component event handlers to use `(value) => ...` instead of the standard `(e) => e.target.value` which caused breaking bugs.
 - **Prop Warning Fixes:** Resolved React DOM warnings (`wrapperClassName`) on the Shadcn Table by leveraging Tailwind arbitrary variants (`[&_div[data-slot=table-container]]:...`) to target the inner wrapper directly without passing invalid props.
+
+## [2026-07-03] Programmes Module & Form Enhancements
+
+### 🚀 Feature Additions
+- **Programmes Module Migration:** Built out the entire `Programmes` module (`Index`, `ProgrammeTable`, `CreateProgrammeDialog`, `EditProgrammeDialog`) mirroring the robust architecture created for `Batches`.
+- **Soft Deletion Architecture:** Established that standard `DELETE` and `PATCH` actions are best-practice for 'soft-deleting' resources (setting `status = inactive`), completely avoiding database constraint headaches.
+
+### 🐛 Bug Fixes & Refactoring
+- **Radix UI Portal Form Bug:** Fixed a classic Shadcn/Radix issue where `<form>` tags wrapped around `<DialogContent>` break form submissions. Moved the `<form>` inside the `DialogContent` so submit buttons wire up correctly.
+- **Naming Collisions Resolved:** Fixed a prop shadowing issue in `ChangeStatusDialog` where `const route = useRoute()` collided with the `route` prop, by cleanly renaming the variable to `ziggyRoute`.
+- **React DOM Warning Fixed:** Corrected the `disable={processing}` typo to the standard HTML boolean attribute `disabled={processing}` to prevent React stringification warnings.
+- **Controller Variable Cleanup:** Corrected leftover copy-paste artifacts (`$batches` -> `$programmes`) in `ProgrammeController.php` for cleaner, self-documenting code.

@@ -5,6 +5,7 @@ import { useRoute } from 'ziggy-js';
 import { Filter, Search } from 'lucide-react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import CreateProgrammeDialog from './components/CreateProgrammeDialog';
+import { ProgrammeTable } from './components/ProgrammeTable';
 
 
 export default function Programmes({ programmes, filters }) {
@@ -28,7 +29,7 @@ export default function Programmes({ programmes, filters }) {
 
     const handleClearFilters = () => {
         filterForm.setData({ search: '', status: 'all' });
-        router.get(route('admin.progeammes.index'), {}, { preserveState: true, preserveScroll: true });
+        router.get(route('admin.programmes.index'), {}, { preserveState: true, preserveScroll: true });
     }
 
     const handlePerPageChange = (value) => {
@@ -50,7 +51,7 @@ export default function Programmes({ programmes, filters }) {
         status: '',
     });
 
-    useEffect(() => { bulkForm.setData('programmes_ids', Array.from(selectedIds)) }, [selectedIds]);
+    useEffect(() => { bulkForm.setData('programme_ids', Array.from(selectedIds)) }, [selectedIds]);
 
     const handleSelectAll = (checked) => {
         if (checked) {
@@ -172,8 +173,8 @@ export default function Programmes({ programmes, filters }) {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectItem value="active">Set Active</SelectItem>
-                                        <SelectItem value="inactive">Set Inactive</SelectItem>
+                                        <SelectItem value="active">Active</SelectItem>
+                                        <SelectItem value="inactive">Inactive</SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
@@ -185,7 +186,7 @@ export default function Programmes({ programmes, filters }) {
 
 
                     {/* DATA TABLE */}
-                    {/* <BatchTable batches={batches} selectedIds={selectedIds} handleSelectAll={handleSelectAll} handleSelectRow={handleSelectRow} handlePerPageChange={handlePerPageChange} /> */}
+                    <ProgrammeTable programmes={programmes} selectedIds={selectedIds} handleSelectAll={handleSelectAll} handleSelectRow={handleSelectRow} handlePerPageChange={handlePerPageChange} />
                 </div>
             </div>
         </>

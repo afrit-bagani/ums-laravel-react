@@ -1,5 +1,8 @@
-import { RefreshCw } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { useForm } from "@inertiajs/react";
+import { useRoute } from "ziggy-js";
+import { Check, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogClose,
@@ -9,7 +12,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
     Select,
     SelectContent,
@@ -17,27 +20,22 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-import { Field, FieldGroup } from "@/components/ui/field"
-import { Label } from "@/components/ui/label"
-import { useForm } from "@inertiajs/react"
-import {  Check, } from "lucide-react"
-import { useRoute } from "ziggy-js"
-import { useState } from "react"
+} from "@/components/ui/select";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { Label } from "@/components/ui/label";
 
-
-export default function ChangeStatusDialog({batch}) {
-  const route = useRoute();
+export default function ChangeStatusDialog({status, route, id, title}) {
+    const ziggyRoute = useRoute();
     const [isOpen, setIsOpen] = useState(false);
 
     const { data, setData, patch, processing} = useForm({
-        status: batch?.status || 'active',
+        status: status || 'active',
     });
 
     function handleSubmit(e) {
         e.preventDefault();
 
-        patch(route('admin.batches.change-status', batch?.batch_id), {
+        patch(ziggyRoute(route, id), {
             onSuccess: () => {
                 setIsOpen(false);
             }
@@ -48,7 +46,7 @@ export default function ChangeStatusDialog({batch}) {
         setIsOpen(open)
         
         setData({
-          status: batch?.status || 'active',
+          status: status || 'active',
         });
     }
   return (
@@ -57,22 +55,22 @@ export default function ChangeStatusDialog({batch}) {
                  <button
                     type="button"
                     className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-sky-50 text-sky-700 hover:bg-sky-100 dark:bg-sky-950/50 dark:text-sky-300 dark:hover:bg-sky-900 border border-transparent hover:border-sky-200 dark:hover:border-sky-800 transition-colors"
-                    title="Change batch status"
+                    title="Change Status"
                 >
                     <RefreshCw className="w-3.5 h-3.5" data-icon="inline-start" /> Change Status
                 </button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-sm">
                 <DialogHeader>
-                    <DialogTitle>Edit Batch Status</DialogTitle>
+                    <DialogTitle>Edit {title} Status</DialogTitle>
                     <DialogDescription>
-                        Update the status for this student batch.
+                        Update the status for this {title.toLowerCase()}.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>
                     <FieldGroup>
                         <Field>
-                            <Label htmlFor="status">Select Batch Status</Label>
+                            <Label htmlFor="status">Select {title} Status</Label>
                             <Select id='status'
                                 value={data.status}
                                 onValueChange={(value) => setData('status', value)}>
