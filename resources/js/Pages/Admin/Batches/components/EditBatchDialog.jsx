@@ -124,7 +124,7 @@ export default function EditBatchDialog({batch}) {
                     </FieldGroup>
                     <DialogFooter className="mt-6">
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button type="button" variant="outline">Cancel</Button>
                         </DialogClose>
                         <Button
                             type="submit"

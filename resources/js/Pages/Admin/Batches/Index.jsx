@@ -174,8 +174,8 @@ export default function Batches({ batches, filters }) {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectItem value="active">Set Active</SelectItem>
-                                        <SelectItem value="inactive">Set Inactive</SelectItem>
+                                        <SelectItem value="active">Active</SelectItem>
+                                        <SelectItem value="inactive">Inactive</SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
