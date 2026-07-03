@@ -122,7 +122,7 @@ class ProgrammeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function changeStatus(Request $request, $programme_id)
+    public function updateStatus(Request $request, $programme_id)
     {
         $request->merge(['programme_id' => $programme_id]);
 
@@ -138,7 +138,7 @@ class ProgrammeController extends Controller
         return back()->with('message', 'Programme status changed successfully');
     }
 
-    public function bulkStatus(Request $request)
+    public function bulkUpdateStatus(Request $request)
     {
         $request->validate([
             'programme_ids' => ['required', 'array'],

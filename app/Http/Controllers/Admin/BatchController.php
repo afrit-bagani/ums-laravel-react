@@ -122,7 +122,7 @@ class BatchController extends Controller
     /**
      * Update status of the specified resource in storage.
      */
-    public function changeStatus(Request $request, $batch_id)
+    public function updateStatus(Request $request, $batch_id)
     {
         $request->merge(['batch_id' => $batch_id]);
 
@@ -138,7 +138,7 @@ class BatchController extends Controller
         return back()->with('message', 'Batch status changed successfully.');
     }
 
-    public function bulkStatus(Request $request)
+    public function bulkUpdateStatus(Request $request)
     {
         $request->validate([
             'batch_ids' => ['required', 'array'],

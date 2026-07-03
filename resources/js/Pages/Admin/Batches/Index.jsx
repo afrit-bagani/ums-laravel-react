@@ -78,7 +78,7 @@ export default function Batches({ batches, filters }) {
         e.preventDefault();
         if (selectedIds.size === 0) return;
 
-        bulkForm.patch(route('admin.batches.bulk-status'), {
+        bulkForm.patch(route('admin.batches.bulk-update-status'), {
             preserveScroll: true,
             onSuccess: () => {
                 setSelectedIds(new Set());

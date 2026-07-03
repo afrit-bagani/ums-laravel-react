@@ -77,7 +77,7 @@ export default function Programmes({ programmes, filters }) {
         e.preventDefault();
         if (selectedIds.size === 0) return;
 
-        bulkForm.patch(route('admin.programmes.bulk-status'), {
+        bulkForm.patch(route('admin.programmes.bulk-update-status'), {
             preserveScroll: true,
             onSuccess: () => {
                 setSelectedIds(new Set());

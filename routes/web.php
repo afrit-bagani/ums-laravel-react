@@ -22,16 +22,16 @@ Route::middleware(['auth', 'can:access-admin-panel'])->group(function () {
     // Batches
     Route::get('/admin/batches', [BatchController::class, 'index'])->name('admin.batches.index');
     Route::post('/admin/batches', [BatchController::class, 'store'])->name('admin.batches.store');
-    Route::patch('/admin/batches/bulk-status', [BatchController::class, 'bulkStatus'])->name('admin.batches.bulk-status');
+    Route::patch('/admin/batches/bulk-update-status', [BatchController::class, 'bulkUpdateStatus'])->name('admin.batches.bulk-update-status');
     Route::patch('/admin/batches/{batch_id}', [BatchController::class, 'update'])->name('admin.batches.update');
-    Route::patch('/admin/batches/{batch_id}/status', [BatchController::class, 'changeStatus'])->name('admin.batches.change-status');
+    Route::patch('/admin/batches/{batch_id}/status', [BatchController::class, 'updateStatus'])->name('admin.batches.update-status');
 
     // Programmes
     Route::get('/admin/programmes', [ProgrammeController::class, 'index'])->name('admin.programmes.index');
     Route::post('/admin/programmes', [ProgrammeController::class, 'store'])->name('admin.programmes.store');
-    Route::patch('/admin/programmes/bulk-status', [ProgrammeController::class, 'bulkStatus'])->name('admin.programmes.bulk-status');
+    Route::patch('/admin/programmes/bulk-update-status', [ProgrammeController::class, 'bulkUpdateStatus'])->name('admin.programmes.bulk-update-status');
     Route::patch('/admin/programmes/{programme_id}', [ProgrammeController::class, 'update'])->name('admin.programmes.update');
-    Route::patch('/admin/programmes/{programme_id}/status', [ProgrammeController::class, 'changeStatus'])->name('admin.programmes.change-status');
+    Route::patch('/admin/programmes/{programme_id}/status', [ProgrammeController::class, 'updateStatus'])->name('admin.programmes.update-status');
 
     Route::post('/admin/logout', [AdminLoginController::class, 'destroy'])->name('admin.logout');
 });
