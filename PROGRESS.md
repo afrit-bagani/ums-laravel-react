@@ -27,3 +27,20 @@ This file tracks the ongoing features, refactoring, and UI enhancements made to 
 - **Naming Collisions Resolved:** Fixed a prop shadowing issue in `ChangeStatusDialog` where `const route = useRoute()` collided with the `route` prop, by cleanly renaming the variable to `ziggyRoute`.
 - **React DOM Warning Fixed:** Corrected the `disable={processing}` typo to the standard HTML boolean attribute `disabled={processing}` to prevent React stringification warnings.
 - **Controller Variable Cleanup:** Corrected leftover copy-paste artifacts (`$batches` -> `$programmes`) in `ProgrammeController.php` for cleaner, self-documenting code.
+
+## [2026-07-06] Courses Module, SQL Optimization & UI Polish
+
+### 🚀 Courses Module & SQL Optimization
+- **Raw SQL & Joins:** Rewrote `CourseController.php` methods to use raw `DB::select`, `DB::insert`, and `DB::update` for maximum performance instead of standard Eloquent ORM. 
+- **Inner Join Implementation:** Added an `INNER JOIN` to the course fetch query (`JOIN programme_master p ON c.programme_id = p.programme_id`) to successfully display the associated `programme_code` in the frontend table.
+- **SQL Ambiguous Column Fix:** Prepended table aliases (`c.code`, `c.status`) to `WHERE` clauses to prevent ambiguous column crashes during search and filter operations.
+- **Cache Serialization Fix:** Fixed a fatal `__PHP_Incomplete_Class_Name` error caused by Laravel file cache improperly serializing a `Collection` of `stdClass` objects. Resolved this by mapping to raw arrays and updating the cache key to guarantee clean data arrays for Inertia.
+
+### 🐛 Bug Fixes & React Hydration
+- **React Hydration Mismatch:** Hunted down a fatal hydration mismatch error in `CourseTable.jsx` that was caused by a stray `2` character rendering between two `TableCell` elements, which created an invalid HTML DOM structure.
+- **Validation Rule Typo:** Fixed an internal Laravel validation crash (`Undefined array key 1`) in the `bulkUpdateStatus` method where `Rule::exists('course_master, course_id')` was incorrectly passed as a single string instead of two distinct arguments.
+- **UI Error State Fixes:** Cleaned up frontend error displays in `CreateCourseDialog` where copy-paste typos mapped `{errors.status}` to the `programme_id` field.
+
+### 🎨 Table Aesthetic Polish
+- **Uniform Action Columns:** Refined the alignment of the `Action` columns across the entire Admin Dashboard (`BatchTable`, `ProgrammeTable`, `CourseTable`). Removed `text-center` from the `TableHead` and wrapped the row buttons in `<div className="flex justify-start">` to guarantee crisp, uniform left-alignment.
+- **Shadcn Typography Inheritance:** Fixed a styling issue in `CourseTable` where `<TableCell>` typography classes (`font-semibold text-gray-900`) weren't applying to text inside `<Badge>` components. Explicitly passed the classes into the `Badge` variant to override the defaults.
