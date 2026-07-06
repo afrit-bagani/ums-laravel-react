@@ -117,18 +117,20 @@ export default function Programmes({ programmes, filters }) {
                             </div>
                             <div className='flex flex-col sm:flex-row gap-2 sm:ml-auto w-full sm:w-auto'>
                                 <div className="relative w-full sm:w-44">
-                                    <Filter className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 z-10 pointer-events-none" />
                                     <Select
                                         value={filterForm.data.status}
                                         onValueChange={(value) => filterForm.setData('status', value)}
                                         defaultValue={filterForm.data.status}
                                     >
-                                        <SelectTrigger className="w-full pl-9 pr-3 bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-500/30 rounded-xl focus:ring-4 focus:ring-indigo-500/10 h-[38px] text-sm shadow-none">
-                                            <SelectValue placeholder="All Statuses" />
+                                        <SelectTrigger className="w-full px-3.5 bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-500/30 rounded-xl focus:ring-4 focus:ring-indigo-500/10 h-[38px] text-sm shadow-none">
+                                            <div className="flex items-center gap-2">
+                                                <Filter className="text-gray-400 w-4 h-4" />
+                                                <SelectValue placeholder="All" />
+                                            </div>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
-                                                <SelectItem value="all">All Statuses</SelectItem>
+                                                <SelectItem value="all">All</SelectItem>
                                                 <SelectItem value="active">Active Only</SelectItem>
                                                 <SelectItem value="inactive">Inactive Only</SelectItem>
                                             </SelectGroup>
