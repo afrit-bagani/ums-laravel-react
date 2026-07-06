@@ -140,7 +140,7 @@ export default function CreateCourseDialog({ programmes }) {
               disabled={processing}>
               {processing ? 'Saving...' : (
                 <>
-                  <Check className="w-4 h-4" /> Create Batch
+                  <Check className="w-4 h-4" /> Create Course
                 </>)
               }
             </Button>
