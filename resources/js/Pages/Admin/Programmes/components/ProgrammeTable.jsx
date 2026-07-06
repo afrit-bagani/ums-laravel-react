@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table"
 import Pagination from "@/components/Pagination";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 
 export function ProgrammeTable({ programmes, selectedIds, handleSelectRow, handleSelectAll, handlePerPageChange }) {
   const selectAll = programmes.data.length > 0 && programmes.data.every(programme => selectedIds.has(programme.programme_id));
@@ -63,9 +64,11 @@ export function ProgrammeTable({ programmes, selectedIds, handleSelectRow, handl
                     </span>
                   </TableCell>
                   <TableCell className="py-2.5 px-4">
-                    <ActionRow programme={programme} />
+                    <div className="flex justify-start">
+                      <ActionRow programme={programme} />
+                    </div>
                   </TableCell>
-                  <TableCell className="py-2.5 px-4 font-semibold text-gray-900">{programme.code}</TableCell>
+                  <TableCell className="py-2.5 px-4"><Badge variant="secondary" className="font-bold">{programme.code}</Badge></TableCell>
                   <TableCell className="py-2.5 px-4 text-gray-600">{programme.name}</TableCell>
                 </TableRow>
               );

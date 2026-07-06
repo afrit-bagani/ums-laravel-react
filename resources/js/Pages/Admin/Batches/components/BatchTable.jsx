@@ -9,6 +9,7 @@ import {
 import ActionRow from "./ActionRow";
 import Pagination from "@/components/Pagination";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 
 export function BatchTable({ batches, selectedIds, handleSelectRow, handleSelectAll, handlePerPageChange }) {
   const selectAll = batches.data.length > 0 && batches.data.every(b => selectedIds.has(b.batch_id));
@@ -63,9 +64,11 @@ export function BatchTable({ batches, selectedIds, handleSelectRow, handleSelect
                     </span>
                   </TableCell>
                   <TableCell className="py-2.5 px-4">
-                    <ActionRow batch={batch} />
+                    <div className="flex justify-start">
+                      <ActionRow batch={batch} />
+                    </div>
                   </TableCell>
-                  <TableCell className="py-2.5 px-4 font-semibold text-gray-900">{batch.code}</TableCell>
+                  <TableCell className="py-2.5 px-4"><Badge variant="secondary" className="font-bold">{batch.code}</Badge></TableCell>
                   <TableCell className="py-2.5 px-4 text-gray-600">{batch.name}</TableCell>
                 </TableRow>
               );
