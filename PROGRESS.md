@@ -44,3 +44,17 @@ This file tracks the ongoing features, refactoring, and UI enhancements made to 
 ### 🎨 Table Aesthetic Polish
 - **Uniform Action Columns:** Refined the alignment of the `Action` columns across the entire Admin Dashboard (`BatchTable`, `ProgrammeTable`, `CourseTable`). Removed `text-center` from the `TableHead` and wrapped the row buttons in `<div className="flex justify-start">` to guarantee crisp, uniform left-alignment.
 - **Shadcn Typography Inheritance:** Fixed a styling issue in `CourseTable` where `<TableCell>` typography classes (`font-semibold text-gray-900`) weren't applying to text inside `<Badge>` components. Explicitly passed the classes into the `Badge` variant to override the defaults.
+
+## [2026-07-07] Subjects Module & Premium UI Modernization
+
+### 🚀 Feature Additions & Backend Excellence
+- **Subject Module Creation:** Built out the full `Subjects` module (`Index`, `Create`, `Edit`, `Show`, `SubjectTable`) using Inertia, React, and strict raw SQL for ultimate performance.
+- **Strict SQL Optimization (`GEMINI.md`):** Adhered strictly to the custom architecture rules by bypassing Eloquent. Used parameterized `DB::select`, `DB::insert`, and `DB::update` for all Controller methods, ensuring completely injection-safe and lightning-fast database interactions.
+- **Complex JOIN Integration:** Upgraded the `show` method with an advanced multi-table `LEFT JOIN` (pulling from `course_master`, `programme_master`, and `users` tables) to provide human-readable references for academic hierarchies and record audits without N+1 overhead.
+- **Validation Refactoring:** Replaced all string-based `$request->validate()` rules with the cleaner, array-based `Rule` object syntax (e.g., `Rule::exists()`, `Rule::unique()->ignore()`), preventing string-splitting bugs and improving maintainability.
+
+### 🎨 Premium UI & Shadcn Polish
+- **Glassmorphic "Show" Page:** Completely overhauled the `ShowSubject` view to feature a stunning, state-of-the-art layout. Utilized a vivid gradient background, `backdrop-blur-md` glassmorphism headers, and interactive hover states (`hover:shadow-xl`, `hover:scale-105`) to create a "wow" factor.
+- **Marks Configuration Display:** Designed a beautiful 3-column split for Subject Marks (Internal, Theory, Practical) utilizing custom Shadcn badges and soft, color-coded `lucide-react` icons (orange, blue, teal).
+- **Record Audit Sidebar:** Implemented a clean sidebar panel to track "Created By" and "Updated By" timestamps using dynamic `new Date().toLocaleString()` formats and user relationship mapping.
+- **Dynamic Form Population:** Bootstrapped the Inertia `useForm` hook in the `Edit` page to smoothly initialize with existing database data (including complex dependent dropdowns for Programmes -> Courses).
