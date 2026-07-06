@@ -56,7 +56,7 @@ class ProgrammeController extends Controller
         $dataBindings = array_merge($bindings, [$perPage, $offset]);
 
         $programmes = DB::select(
-            "SELECT * from programme_master $query ORDER BY programme_id DESC LIMIT ? OFFSET ? ",
+            "SELECT * from programme_master $query ORDER BY programme_id ASC LIMIT ? OFFSET ? ",
             $dataBindings
         );
 
