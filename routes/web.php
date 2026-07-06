@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\BatchController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\ProgrammeController;
+use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\StudentLoginController;
 use App\Http\Controllers\Student\StudentDashboardController;
@@ -40,6 +41,16 @@ Route::middleware(['auth', 'can:access-admin-panel'])->group(function () {
     Route::patch('/admin/courses/bulk-update-status', [CourseController::class, 'bulkUpdateStatus'])->name('admin.courses.bulk-update-status');
     Route::patch('/admin/courses/{course_id}', [CourseController::class, 'update'])->name('admin.courses.update');
     Route::patch('/admin/courses/{course_id}/status', [CourseController::class, 'updateStatus'])->name('admin.courses.update-status');
+
+    // Subjects
+    Route::get('/admin/subjects', [SubjectController::class, 'index'])->name('admin.subjects.index');
+    Route::get('/admin/subjects/create', [SubjectController::class, 'create'])->name('admin.subjects.create');
+    Route::post('/admin/subjects', [SubjectController::class, 'store'])->name('admin.subjects.store');
+    Route::patch('/admin/subjects/bulk-update-status', [SubjectController::class, 'bulkUpdateStatus'])->name('admin.subjects.bulk-update-status');
+    Route::get('/admin/subjects/{id}', [SubjectController::class, 'show'])->name('admin.subjects.show');
+    Route::get('/admin/subjects/{id}/edit', [SubjectController::class, 'edit'])->name('admin.subjects.edit');
+    Route::patch('/admin/subjects/{id}', [SubjectController::class, 'update'])->name('admin.subjects.update');
+    Route::patch('/admin/subjects/{id}/status', [SubjectController::class, 'updateStatus'])->name('admin.subjects.update-status');
 
     Route::post('/admin/logout', [AdminLoginController::class, 'destroy'])->name('admin.logout');
 });

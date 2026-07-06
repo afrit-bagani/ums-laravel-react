@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subject extends Model
 {
-    /** @use HasFactory<\Database\Factories\SubjectFactory> */
     use HasFactory;
+    
+    protected $table = 'subject_master';
+    protected $primaryKey = 'subject_id';
 }
