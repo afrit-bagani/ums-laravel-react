@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -42,7 +42,7 @@ class CourseController extends Controller
         }
 
         // status filter
-        if ($status !== null  && $status !== 'all') {
+        if ($status !== null && $status !== 'all') {
             $whereClause[] = 'c.status = ?';
             $bindings[] = $status;
         }
@@ -81,7 +81,8 @@ class CourseController extends Controller
 
         $programmes = Cache::rememberForever('active_programmes', function () {
             $results = DB::select("SELECT programme_id, name FROM programme_master WHERE status = 'active'");
-            return array_map(fn($item) => (array) $item, $results);
+
+            return array_map(fn ($item) => (array) $item, $results);
         });
 
         return Inertia::render('Admin/Courses/Index', [
@@ -104,10 +105,10 @@ class CourseController extends Controller
         ]);
 
         DB::insert('INSERT INTO course_master (programme_id, code, name, status, created_by, created_at, updated_at) VALUES (?,?,?,?,?,?,?)', [
-            $validated['programme_id'], 
-            $validated['code'], 
-            $validated['name'], 
-            $validated['status'], 
+            $validated['programme_id'],
+            $validated['code'],
+            $validated['name'],
+            $validated['status'],
             Auth::id(),
             now(),
             now(),
@@ -121,7 +122,7 @@ class CourseController extends Controller
      */
     public function update(Request $request, $course_id)
     {
-        $request->merge(['course_id' => $course_id]);   
+        $request->merge(['course_id' => $course_id]);
 
         $validated = $request->validate([
             'course_id' => ['required', Rule::exists('course_master', 'course_id')],
@@ -131,7 +132,7 @@ class CourseController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        DB::update("UPDATE course_master SET programme_id = ?, code = ?, name = ?, status = ?, updated_at = ? where course_id = ?", [
+        DB::update('UPDATE course_master SET programme_id = ?, code = ?, name = ?, status = ?, updated_at = ? where course_id = ?', [
             $validated['programme_id'], $validated['code'], $validated['name'], $validated['status'], now(), $course_id,
         ]);
 
@@ -143,26 +144,26 @@ class CourseController extends Controller
      */
     public function updateStatus(Request $request, $course_id)
     {
-        $request->merge(['course_id' => $course_id]);   
+        $request->merge(['course_id' => $course_id]);
 
         $validated = $request->validate([
             'course_id' => ['required', Rule::exists('course_master', 'course_id')],
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        DB::update("UPDATE course_master SET status = ? , updated_at = ? WHERE course_id = ?", [
-            $validated['status'], 
-            now(), 
+        DB::update('UPDATE course_master SET status = ? , updated_at = ? WHERE course_id = ?', [
+            $validated['status'],
+            now(),
             $course_id,
         ]);
 
-        return back()->with('message', 'Course status changed successfully');   
+        return back()->with('message', 'Course status changed successfully');
     }
 
-    public function bulkUpdateStatus(Request $request) 
+    public function bulkUpdateStatus(Request $request)
     {
         $validated = $request->validate([
-            'course_ids' => ['required', 'array'], 
+            'course_ids' => ['required', 'array'],
             'course_ids.*' => ['required', Rule::exists('course_master', 'course_id')],
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
@@ -170,11 +171,11 @@ class CourseController extends Controller
         $placeHolders = implode(',', array_fill(0, count($request->course_ids), '?'));
 
         DB::update("UPDATE course_master SET status = ?, updated_at = ? WHERE course_id IN ($placeHolders)", [
-            $validated['status'], 
+            $validated['status'],
             now(),
-            ...$validated['course_ids']
+            ...$validated['course_ids'],
         ]);
 
-        return back()->with('message', 'Course status changed successfully');   
+        return back()->with('message', 'Course status changed successfully');
     }
 }
