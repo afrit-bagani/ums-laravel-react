@@ -58,3 +58,15 @@ This file tracks the ongoing features, refactoring, and UI enhancements made to 
 - **Marks Configuration Display:** Designed a beautiful 3-column split for Subject Marks (Internal, Theory, Practical) utilizing custom Shadcn badges and soft, color-coded `lucide-react` icons (orange, blue, teal).
 - **Record Audit Sidebar:** Implemented a clean sidebar panel to track "Created By" and "Updated By" timestamps using dynamic `new Date().toLocaleString()` formats and user relationship mapping.
 - **Dynamic Form Population:** Bootstrapped the Inertia `useForm` hook in the `Edit` page to smoothly initialize with existing database data (including complex dependent dropdowns for Programmes -> Courses).
+
+## [2026-07-07] Students Module Architecture & Backend Logic
+
+### 🏗️ Advanced Database Architecture
+- **Multi-Table Normalization:** Designed a scalable 4-table architecture (`student_profiles`, `student_paper_selections`, `student_documents`, `student_payments`) to handle the massive student registration wizard without bloating a single table.
+- **Foreign Key Refactoring:** Switched the primary foreign key connection from `user_id` to `student_profile_id` for all student sub-tables, ensuring strict domain isolation between Admin/Auth and Student Data.
+- **Robust Mock Data (Seeders):** Engineered a comprehensive `StudentProfileSeeder` that perfectly orchestrates dummy data across all 4 tables simultaneously, generating realistic `registration_numbers` (e.g., `2024-4039`) derived from `batch_master` relationships.
+
+### 🚀 Backend & SQL Optimization
+- **Controller Splitting:** Created 4 distinct controllers (`StudentProfileController`, `StudentPaperSelectionController`, etc.) mapping directly to the 4 wizard tabs, guaranteeing zero "Mega-Controller" technical debt.
+- **Array-based Dynamic SQL Building:** Replaced simple `1=1` concatenation with the professional `$whereClauses[]` array and `implode(' AND ', ...)` pattern for significantly cleaner, scalable raw SQL search generation.
+- **Symmetric LEFT JOINs:** Upgraded the `StudentProfileController@index` method to use explicit `LEFT JOIN`s for related programme/course/batch data. Carefully synced the exact same `LEFT JOIN`s to the `COUNT(*)` pagination query to guarantee it won't crash when search filters are added.

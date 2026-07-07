@@ -17,6 +17,7 @@ return new class extends Migration
 
             // --- PERSONAL INFORMATION ---
             $table->string('registration_number')->unique();
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->string('full_name', 50);
             $table->string('father_name', 50);
             $table->string('mother_name', 50);

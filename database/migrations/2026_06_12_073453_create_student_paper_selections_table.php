@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('student_paper_selections', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('student_profile_id')->constrained('student_profiles')->cascadeOnDelete();
             $table->foreignId('programme_id')->constrained('programme_master', 'programme_id')->cascadeOnDelete();
             $table->foreignId('course_id')->constrained('course_master', 'course_id')->cascadeOnDelete();
             $table->foreignId('batch_id')->constrained('batch_master', 'batch_id')->cascadeOnDelete();
-            $table->foreignId('subject_id')->constrained('subject_master', 'subject_id')->cascadeOnDelete();
             $table->timestamps();
         });
     }

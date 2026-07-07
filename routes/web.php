@@ -3,6 +3,10 @@
 use App\Http\Controllers\Admin\BatchController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\ProgrammeController;
+use App\Http\Controllers\Admin\Student\StudentDocumentController;
+use App\Http\Controllers\Admin\Student\StudentPaperSelectionController;
+use App\Http\Controllers\Admin\Student\StudentPaymentController;
+use App\Http\Controllers\Admin\Student\StudentProfileController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\StudentLoginController;
@@ -51,6 +55,20 @@ Route::middleware(['auth', 'can:access-admin-panel'])->group(function () {
     Route::get('/admin/subjects/{id}/edit', [SubjectController::class, 'edit'])->name('admin.subjects.edit');
     Route::patch('/admin/subjects/{id}', [SubjectController::class, 'update'])->name('admin.subjects.update');
     Route::patch('/admin/subjects/{id}/status', [SubjectController::class, 'updateStatus'])->name('admin.subjects.update-status');
+
+    // Students
+    Route::get('/admin/students', [StudentProfileController::class, 'index'])->name('admin.students.index');
+    Route::get('/admin/students/create', [StudentProfileController::class, 'create'])->name('admin.students.create');
+    Route::post('/admin/students', [StudentProfileController::class, 'store'])->name('admin.students.store');
+    Route::patch('/admin/students/bulk-update-status', [StudentProfileController::class, 'bulkUpdateStatus'])->name('admin.students.bulk-update-status');
+    Route::get('/admin/students/{id}', [StudentProfileController::class, 'show'])->name('admin.students.show');
+    Route::get('/admin/students/{id}/edit', [StudentProfileController::class, 'edit'])->name('admin.students.edit');
+    Route::patch('/admin/students/{id}', [StudentProfileController::class, 'update'])->name('admin.students.update');
+    Route::patch('/admin/students/{id}/status', [StudentProfileController::class, 'updateStatus'])->name('admin.students.update-status');
+
+    Route::post('/admin/students/{id}/papers', [StudentPaperSelectionController::class, 'store'])->name('admin.students.papers.store');
+    Route::post('/admin/students/{id}/documents', [StudentDocumentController::class, 'store'])->name('admin.students.documents.store');
+    Route::post('/admin/students/{id}/payments', [StudentPaymentController::class, 'store'])->name('admin.students.payments.store');
 
     Route::post('/admin/logout', [AdminLoginController::class, 'destroy'])->name('admin.logout');
 });

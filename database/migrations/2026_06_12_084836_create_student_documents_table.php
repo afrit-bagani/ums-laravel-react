@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('student_documents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('student_profile_id')->constrained('student_profiles')->cascadeOnDelete();
             $table->string('photo_path');
             $table->string('signature_path');
             $table->timestamps();
