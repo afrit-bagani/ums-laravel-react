@@ -70,3 +70,17 @@ This file tracks the ongoing features, refactoring, and UI enhancements made to 
 - **Controller Splitting:** Created 4 distinct controllers (`StudentProfileController`, `StudentPaperSelectionController`, etc.) mapping directly to the 4 wizard tabs, guaranteeing zero "Mega-Controller" technical debt.
 - **Array-based Dynamic SQL Building:** Replaced simple `1=1` concatenation with the professional `$whereClauses[]` array and `implode(' AND ', ...)` pattern for significantly cleaner, scalable raw SQL search generation.
 - **Symmetric LEFT JOINs:** Upgraded the `StudentProfileController@index` method to use explicit `LEFT JOIN`s for related programme/course/batch data. Carefully synced the exact same `LEFT JOIN`s to the `COUNT(*)` pagination query to guarantee it won't crash when search filters are added.
+
+## [2026-07-08] Student Registration UI Wizard & Atomic Workflows
+
+### 🚀 Atomic Create & Segmented Edit Architecture
+- **Unified Creation Wizard:** Transformed the `Create.jsx` view into a cohesive, multi-step wizard managed by a single monolithic Inertia `useForm` hook. The form gathers all data across 4 tabs before submission, providing a fluid user experience.
+- **Atomic Backend Transactions:** Rewrote `StudentProfileController@store` to receive the entire wizard payload. It executes within a secure `DB::transaction`, handling file uploads, generating batch-year-prefixed `registration_number`s, and inserting rows across all 4 student tables atomically. If any query fails, the entire student creation safely rolls back.
+- **Piecemeal Edit Flow:** Designed `Edit.jsx` as a container where all 4 tabs are fully enabled. Each tab wraps an independent Inertia form (`EditBasicInfoForm`, `EditDocumentForm`, etc.) that points to its own controller's `PATCH` endpoint, allowing targeted updates without resubmitting massive payloads.
+- **Component Reusability:** Refactored the internal form components (`CreateBasicInfoForm`, etc.) into pure, presentational UI components. They are now flawlessly reused between the Create wizard and the individual Edit wrappers, passing dynamic `buttonLabel` and `processing` states down as props.
+
+### 🐛 Form & Validation Enhancements
+- **Centralized Wizard Validation:** Grouped all cross-tab validation rules into a single `StudentProfileRequest`.
+- **Intelligent Error Navigation:** Handled Inertia's `onError` callback in the Create wizard to automatically switch the user's active tab to whichever section contains a validation failure, ensuring errors aren't silently hidden.
+- **File Upload over PATCH:** Utilized the `_method: patch` workaround to successfully send `multipart/form-data` updates (photos and signatures) to the backend during the piecemeal Edit flow.
+- **Export Resolution:** Fixed a fatal Vite build error where `ErrorAlert` was improperly exported by ensuring both named (`export { ErrorAlert }`) and default exports exist.

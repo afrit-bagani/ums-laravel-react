@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Student;
 use App\Http\Controllers\Controller;
 use App\Models\StudentPaperSelection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StudentPaperSelectionController extends Controller
 {
@@ -27,9 +28,39 @@ class StudentPaperSelectionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $id)
     {
-        //
+        $validated = $request->validate([
+            'programme_id' => 'required|integer',
+            'course_id' => 'required|integer',
+            'batch_id' => 'required|integer',
+        ]);
+
+        $createdAt = now();
+        $updatedAt = now();
+
+        DB::insert('INSERT INTO student_paper_selections (student_profile_id, programme_id, course_id, batch_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)', [
+            $id,
+            $validated['programme_id'],
+            $validated['course_id'],
+            $validated['batch_id'],
+            $createdAt,
+            $updatedAt,
+        ]);
+
+        // Update the temporary Registration Number to use the true Batch Year
+        $batchName = DB::selectOne('SELECT name FROM batche_master WHERE id = ?', [$validated['batch_id']]);
+        if ($batchName) {
+            $batchStartYear = explode('-', $batchName->name)[0] ?? date('Y');
+            $registrationNumber = $batchStartYear.str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+
+            DB::update('UPDATE student_profiles SET registration_number = ? WHERE id = ?', [
+                $registrationNumber,
+                $id,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Academic placement saved successfully.');
     }
 
     /**

@@ -105,7 +105,7 @@ export default function StudentProfiles({ students, filters }) {
           {/* FILTER PANEL */}
           <div className="bg-white rounded-2xl border border-gray-200 p-1.5 shadow-sm flex flex-col lg:flex-row items-center justify-between">
             <form onSubmit={handleFilterSubmit} className="flex flex-col sm:flex-row gap-2 w-full flex-1">
-              <div className="relative flex-1 lg:max-w-md group">
+              <div className="relative flex-1 lg:max-w-2xl group">
                 <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"

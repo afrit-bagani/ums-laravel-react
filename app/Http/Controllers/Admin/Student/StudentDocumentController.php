@@ -48,16 +48,44 @@ class StudentDocumentController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, StudentDocument $studentDocument)
+    public function update(Request $request, $id)
     {
-        //
-    }
+        $request->validate([
+            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+            'signature' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
+        $updates = [];
+        $bindings = [];
+
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('documents', 'public');
+            $updates[] = "photo = ?";
+            $bindings[] = $photoPath;
+        }
+
+        if ($request->hasFile('signature')) {
+            $signaturePath = $request->file('signature')->store('documents', 'public');
+            $updates[] = "signature = ?";
+            $bindings[] = $signaturePath;
+        }
+
+        if (!empty($updates)) {
+            $updates[] = "updated_at = ?";
+            $bindings[] = now();
+            
+            $bindings[] = $id;
+
+            $setClause = implode(', ', $updates);
+            
+            \Illuminate\Support\Facades\DB::update(
+                "UPDATE student_documents SET {$setClause} WHERE student_profile_id = ?",
+                $bindings
+            );
+        }
+
+        return redirect()->back()->with('success', 'Documents updated successfully.');
+    }
      */
     public function destroy(StudentDocument $studentDocument)
     {

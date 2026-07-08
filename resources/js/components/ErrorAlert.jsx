@@ -1,11 +1,10 @@
 import { AlertCircleIcon } from "lucide-react"
-
 import {
     Alert,
     AlertTitle,
 } from "@/components/ui/alert"
 
-export function ErrorAlert({ title }) {
+function ErrorAlert({ title }) {
     return (
         <Alert variant="destructive" className="max-w-md">
             <AlertCircleIcon />
@@ -13,3 +12,6 @@ export function ErrorAlert({ title }) {
         </Alert>
     )
 }
+
+export { ErrorAlert };
+export default ErrorAlert;

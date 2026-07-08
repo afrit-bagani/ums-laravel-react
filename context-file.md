@@ -2270,3 +2270,13 @@ Yes, absolutely!! You are 100% correct!
 I actually tried to add those two `LEFT JOIN`s for you a few minutes ago, but because we were both editing the file at the exact same time, my code got overwritten by your `implode` code!
 
 I just went back in and successfully added those missing `LEFT JOIN`s to your `$totalRecords` query. Now both queries match perfectly, meaning if you ever add a search filter for a course name or a batch name, the pagination won't crash!
+### User Input
+
+Update in details what we have done in PROGRESS.md and context-file.md
+
+### Planner Response
+
+I have updated the architecture to feature an atomic Create workflow and a piecemeal Edit workflow for the Student Registration. 
+- **Create Flow**: Merged all 4 tabs into a single useForm hook that submits atomically to StudentProfileController@store within a DB::transaction, ensuring all student data, papers, documents, and payments are committed together. 
+- **Edit Flow**: Created Edit.jsx which opens all 4 tabs and wraps purely presentational Create* components. Each tab has its own independent form and updates its respective controller via PATCH for targeted updates.
+- **Validation**: Centralized in StudentProfileRequest with automatic error navigation in the frontend wizard.
