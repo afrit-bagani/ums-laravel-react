@@ -3,13 +3,12 @@ import { Head } from '@inertiajs/react';
 import AdminDashboardLayout from "@/Pages/Layouts/Admin/AdminDashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import EditBasicInfoForm from './components/EditBasicInfoForm';
-import EditPaperSelectionForm from './components/EditPaperSelectionForm';
-import EditDocumentForm from './components/EditDocumentForm';
-import EditPaymentForm from './components/EditPaymentForm';
+import EditBasicInfoForm from './components/forms/EditBasicInfoForm';
+import EditPaperSelectionForm from './components/forms/EditPaperSelectionForm';
+import EditDocumentForm from './components/forms/EditDocumentForm';
+import EditPaymentForm from './components/forms/EditPaymentForm';
 
 export default function EditStudent({ programmes_with_courses = [], batches = [], student_profile }) {
-  // We don't need activeTab state to be strict, but we can default to basic-info
   const [activeTab, setActiveTab] = React.useState("basic-info");
 
   return (
@@ -24,7 +23,7 @@ export default function EditStudent({ programmes_with_courses = [], batches = []
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        
+
         <TabsList className="grid w-full grid-cols-4 mb-8 bg-gray-100/80 p-1 rounded-xl">
           <TabsTrigger value="basic-info" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm transition-all">1. Basic Info</TabsTrigger>
           <TabsTrigger value="paper-selection" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm transition-all">2. Academic Placement</TabsTrigger>
@@ -51,8 +50,8 @@ export default function EditStudent({ programmes_with_courses = [], batches = []
               <CardDescription className="text-gray-500">Update programme, course, or batch.</CardDescription>
             </CardHeader>
             <CardContent className="p-6">
-              <EditPaperSelectionForm 
-                programmes_with_courses={programmes_with_courses} 
+              <EditPaperSelectionForm
+                programmes_with_courses={programmes_with_courses}
                 batches={batches}
                 studentProfile={student_profile}
               />

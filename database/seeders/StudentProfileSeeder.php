@@ -23,9 +23,22 @@ class StudentProfileSeeder extends Seeder
             $batch = $batches->random();
             $course = $courses->random();
 
-            // Registration Number based on Batch (e.g., 2022-26 -> 2022xxxx)
-            $batchStartYear = explode('-', $batch->code)[0] ?? '2022';
-            $registrationNumber = $batchStartYear.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            // Registration Number based on Batch (e.g., 2022-26 -> 2022xxxx) (Sequential)
+            $batchStartYear = explode('-', $batch->name ?? $batch->code ?? '2022')[0] ?? '2022';
+
+            $lastProfile = DB::table('student_profiles')
+                ->where('registration_number', 'like', $batchStartYear.'%')
+                ->orderBy('registration_number', 'desc')
+                ->first(['registration_number']);
+
+            if ($lastProfile) {
+                $lastNumber = (int) substr($lastProfile->registration_number, strlen($batchStartYear));
+                $nextNumber = $lastNumber + 1;
+            } else {
+                $nextNumber = 1;
+            }
+
+            $registrationNumber = $batchStartYear.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
             // 1. Create User
             $userId = DB::table('users')->insertGetId([

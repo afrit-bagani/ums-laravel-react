@@ -38,10 +38,11 @@ export default function CreatePaymentForm({ data, setData, errors, processing, b
             <Select value={data.payment_method} onValueChange={(val) => setData('payment_method', val)}>
               <SelectTrigger><SelectValue placeholder="Select Method" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="UPI">UPI</SelectItem>
-                <SelectItem value="Bank Transfer">Bank Transfer (NEFT/RTGS)</SelectItem>
-                <SelectItem value="Cash">Cash</SelectItem>
-                <SelectItem value="Demand Draft">Demand Draft</SelectItem>
+                <SelectItem value="upi">UPI</SelectItem>
+                <SelectItem value="NEFT">Bank Transfer (NEFT)</SelectItem>
+                <SelectItem value="RTGS">Bank Transfer (RTGS)</SelectItem>
+                <SelectItem value="cash">Cash</SelectItem>
+                <SelectItem value="cheque">Cheque / Demand Draft</SelectItem>
               </SelectContent>
             </Select>
             {errors.payment_method && <ErrorAlert title={errors.payment_method} />}

@@ -14,10 +14,10 @@ export default function CreateDocumentForm({ data, setData, errors, onNext, proc
   // We can just add useEffect to set initial previews if they exist.
   React.useEffect(() => {
     if (typeof data.photo === 'string') {
-        setPhotoPreview(`/storage/${data.photo}`);
+      setPhotoPreview(`/storage/${data.photo}`);
     }
     if (typeof data.signature === 'string') {
-        setSignaturePreview(`/storage/${data.signature}`);
+      setSignaturePreview(`/storage/${data.signature}`);
     }
   }, []);
 
@@ -39,9 +39,9 @@ export default function CreateDocumentForm({ data, setData, errors, onNext, proc
       <div>
         <h3 className="text-lg font-semibold text-indigo-950 mb-4 border-b pb-2">Mandatory Documents</h3>
         <p className="text-sm text-gray-500 mb-6">Upload the student's recent passport size photograph and digital signature.</p>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          
+
           <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 hover:bg-gray-50/50 transition-colors">
             <Label className="text-base font-medium mb-4 block">Passport Size Photo <span className="text-red-500">*</span></Label>
             <div className="flex flex-col items-center justify-center space-y-4">
@@ -55,7 +55,7 @@ export default function CreateDocumentForm({ data, setData, errors, onNext, proc
                   <FileImage className="w-10 h-10" />
                 </div>
               )}
-              
+
               <div className="w-full relative">
                 <Input type="file" accept="image/jpeg,image/png,image/jpg" onChange={(e) => handleFileChange(e, 'photo')} />
               </div>
@@ -77,7 +77,7 @@ export default function CreateDocumentForm({ data, setData, errors, onNext, proc
                   <UploadCloud className="w-8 h-8" />
                 </div>
               )}
-              
+
               <div className="w-full relative">
                 <Input type="file" accept="image/jpeg,image/png,image/jpg" onChange={(e) => handleFileChange(e, 'signature')} />
               </div>
@@ -89,11 +89,11 @@ export default function CreateDocumentForm({ data, setData, errors, onNext, proc
       </div>
 
       <div className="flex justify-end pt-4 border-t">
-        <Button 
-          type="button" 
-          onClick={onNext} 
+        <Button
+          type="button"
+          onClick={onNext}
           disabled={processing}
-          size="lg" 
+          size="lg"
           className="px-8 shadow-md"
         >
           {processing ? 'Processing...' : buttonLabel}

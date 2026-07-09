@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StudentProfileRequest extends FormRequest
+class CreateStudentProfileRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.

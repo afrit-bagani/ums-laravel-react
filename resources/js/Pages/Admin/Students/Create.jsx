@@ -1,28 +1,28 @@
 import React, { useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
+import { useRoute } from 'ziggy-js';
 import AdminDashboardLayout from "@/Pages/Layouts/Admin/AdminDashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import CreateBasicInfoForm from './components/CreateBasicInfoForm';
-import CreatePaperSelectionForm from './components/CreatePaperSelectionForm';
-import CreateDocumentForm from './components/CreateDocumentForm';
-import CreatePaymentForm from './components/CreatePaymentForm';
-import { Loader2 } from 'lucide-react';
+import CreateBasicInfoForm from './components/forms/CreateBasicInfoForm';
+import CreatePaperSelectionForm from './components/forms/CreatePaperSelectionForm';
+import CreateDocumentForm from './components/forms/CreateDocumentForm';
+import CreatePaymentForm from './components/forms/CreatePaymentForm';
 
 export default function CreateStudent({ programmes_with_courses = [], batches = [] }) {
+  const route = useRoute();
   const [activeTab, setActiveTab] = useState("basic-info");
-  
+
   const { data, setData, post, processing, errors } = useForm({
     // Basic Info
     full_name: '', father_name: '', mother_name: '', gender: '', dob: '', abc_id: '', aadhaar_no: '', nationality: 'Indian', mobile_no: '', email: '', parent_mobile_no: '', religion: '', caste: '', blood_group: '', marital_status: '', annual_family_income: '', is_blind: false, is_bpl: false, is_minority: false, is_ph: false, present_address: '', present_city: '', present_district: '', present_state: '', present_country: 'India', present_pincode: '', permanent_address: '', permanent_city: '', permanent_district: '', permanent_state: '', permanent_country: 'India', permanent_pincode: '', admission_type: '', exam_name: '', board_name: '', institution_name: '', max_marks: '', marks_obtained: '', percentage: '',
-    
+
     // Paper Selection
     programme_id: '', course_id: '', batch_id: '',
-    
+
     // Documents
     photo: null, signature: null,
-    
+
     // Payments
     fee_type: '', amount: '', payment_method: '', transaction_id: ''
   });
@@ -62,7 +62,7 @@ export default function CreateStudent({ programmes_with_courses = [], batches = 
 
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          
+
           <TabsList className="grid w-full grid-cols-4 mb-8 bg-gray-100/80 p-1 rounded-xl">
             <TabsTrigger value="basic-info" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm transition-all">1. Basic Info</TabsTrigger>
             <TabsTrigger value="paper-selection" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm transition-all">2. Academic Placement</TabsTrigger>
@@ -93,11 +93,11 @@ export default function CreateStudent({ programmes_with_courses = [], batches = 
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                <CreatePaperSelectionForm 
+                <CreatePaperSelectionForm
                   data={data} setData={setData} errors={errors}
-                  programmes_with_courses={programmes_with_courses} 
+                  programmes_with_courses={programmes_with_courses}
                   batches={batches}
-                  onNext={() => setActiveTab('documents')} 
+                  onNext={() => setActiveTab('documents')}
                 />
               </CardContent>
             </Card>

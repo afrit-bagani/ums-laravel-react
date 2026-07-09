@@ -14,8 +14,8 @@ export default function CreatePaperSelectionForm({ data, setData, errors, onNext
       );
       setAvailableCourses(selectedProgramme ? selectedProgramme.courses : []);
       if (selectedProgramme && data.course_id) {
-          const isValid = selectedProgramme.courses.some(c => c.course_id.toString() === data.course_id.toString());
-          if (!isValid) setData('course_id', '');
+        const isValid = selectedProgramme.courses.some(c => c.course_id.toString() === data.course_id.toString());
+        if (!isValid) setData('course_id', '');
       }
     } else {
       setAvailableCourses([]);
@@ -65,8 +65,8 @@ export default function CreatePaperSelectionForm({ data, setData, errors, onNext
               <SelectTrigger><SelectValue placeholder="Select Batch" /></SelectTrigger>
               <SelectContent>
                 {batches.map((batch) => (
-                  <SelectItem key={batch.id} value={batch.id.toString()}>
-                    {batch.name} ({batch.code})
+                  <SelectItem key={batch.batch_id} value={batch.batch_id.toString()}>
+                    {batch.batch_name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -77,11 +77,11 @@ export default function CreatePaperSelectionForm({ data, setData, errors, onNext
       </div>
 
       <div className="flex justify-end pt-4 border-t">
-        <Button 
-          type="button" 
-          onClick={onNext} 
+        <Button
+          type="button"
+          onClick={onNext}
           disabled={processing}
-          size="lg" 
+          size="lg"
           className="px-8 shadow-md"
         >
           {processing ? 'Processing...' : buttonLabel}

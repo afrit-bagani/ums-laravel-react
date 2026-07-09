@@ -66,13 +66,10 @@ Route::middleware(['auth', 'can:access-admin-panel'])->group(function () {
     Route::patch('/admin/students/{id}', [StudentProfileController::class, 'update'])->name('admin.students.update');
     Route::patch('/admin/students/{id}/status', [StudentProfileController::class, 'updateStatus'])->name('admin.students.update-status');
 
-    Route::post('/admin/students/{id}/papers', [StudentPaperSelectionController::class, 'store'])->name('admin.students.papers.store');
     Route::patch('/admin/students/{id}/papers', [StudentPaperSelectionController::class, 'update'])->name('admin.students.papers.update');
-    
-    Route::post('/admin/students/{id}/documents', [StudentDocumentController::class, 'store'])->name('admin.students.documents.store');
+
     Route::patch('/admin/students/{id}/documents', [StudentDocumentController::class, 'update'])->name('admin.students.documents.update');
-    
-    Route::post('/admin/students/{id}/payments', [StudentPaymentController::class, 'store'])->name('admin.students.payments.store');
+
     Route::patch('/admin/students/{id}/payments', [StudentPaymentController::class, 'update'])->name('admin.students.payments.update');
 
     Route::post('/admin/logout', [AdminLoginController::class, 'destroy'])->name('admin.logout');

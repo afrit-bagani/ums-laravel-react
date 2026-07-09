@@ -54,7 +54,7 @@ export default function EditBasicInfoForm({ studentProfile }) {
 
   const handleSubmit = (e) => {
     if (e) e.preventDefault();
-    patch(route('admin.students.update', { student: studentProfile.id }), {
+    patch(route('admin.students.update', { id: studentProfile.id }), {
       preserveScroll: true,
       onSuccess: () => {
         alert("Basic Information updated successfully!");
@@ -64,10 +64,10 @@ export default function EditBasicInfoForm({ studentProfile }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <CreateBasicInfoForm 
-        data={data} 
-        setData={setData} 
-        errors={errors} 
+      <CreateBasicInfoForm
+        data={data}
+        setData={setData}
+        errors={errors}
         onNext={handleSubmit}
         buttonLabel="Update Basic Info"
         processing={processing}

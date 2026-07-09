@@ -24,10 +24,10 @@ export default function EditPaperSelectionForm({ studentProfile, programmes_with
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      <CreatePaperSelectionForm 
-        data={data} 
-        setData={setData} 
-        errors={errors} 
+      <CreatePaperSelectionForm
+        data={data}
+        setData={setData}
+        errors={errors}
         onNext={handleSubmit}
         programmes_with_courses={programmes_with_courses}
         batches={batches}

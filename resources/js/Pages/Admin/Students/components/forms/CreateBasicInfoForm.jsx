@@ -340,7 +340,7 @@ export default function CreateBasicInfoForm({ data, setData, errors, onNext, but
       </div>
 
       <div className="flex justify-end pt-4 border-t border-gray-100">
-        <Button 
+        <Button
           type="button"
           onClick={onNext}
           disabled={processing}
