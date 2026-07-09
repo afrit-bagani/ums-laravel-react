@@ -84,3 +84,16 @@ This file tracks the ongoing features, refactoring, and UI enhancements made to 
 - **Intelligent Error Navigation:** Handled Inertia's `onError` callback in the Create wizard to automatically switch the user's active tab to whichever section contains a validation failure, ensuring errors aren't silently hidden.
 - **File Upload over PATCH:** Utilized the `_method: patch` workaround to successfully send `multipart/form-data` updates (photos and signatures) to the backend during the piecemeal Edit flow.
 - **Export Resolution:** Fixed a fatal Vite build error where `ErrorAlert` was improperly exported by ensuring both named (`export { ErrorAlert }`) and default exports exist.
+
+## [2026-07-09] Student Dashboard & Authentication Workflows
+
+### 🚀 Authentication & Security
+- **Student User Creation:** Fixed a critical bug in `StudentProfileController@store` where students created via the Admin panel did not receive an accompanying `users` table record. Now, creating a student atomically creates a `users` record with their `login_identifier` set to their `registration_number` and assigns a default password of `'password'`.
+- **First-Login Password Reset Flow:** Introduced a mandatory security measure requiring students to change their default password upon first login.
+- **Middleware Interception:** Created and registered the `EnsurePasswordIsChanged` middleware (aliased as `password.changed`). This intercepts any authenticated student whose `is_password_changed` flag is `false` and forces them to the `ChangePassword` view, completely restricting access to the dashboard until secured.
+- **Database Schema Update:** Augmented the `users` table migration to include an `is_password_changed` boolean field (default `false`), ensuring historical compatibility.
+- **Seeder Intelligence:** Updated the `UserSeeder` to default the primary Admin account's `is_password_changed` status to `true`, preventing admins from being trapped in the reset loop.
+
+### 🎨 Student Experience & Dashboard
+- **Read-Only Data Architecture:** Engineered `StudentDashboardController` to execute a comprehensive, high-performance raw SQL `LEFT JOIN` query (similar to the admin's `Show` logic) that securely fetches the authenticated student's full profile, academic placement, documents, and payment history based on their `user_id`.
+- **Premium Dashboard UI:** Built the `Dashboard.jsx` interface utilizing the premium Shadcn UI tabbed layout. The view offers a beautiful, responsive, and categorized presentation of the student's data mimicking the high-quality aesthetics of the admin portal, complete with a dedicated header and logout workflow.

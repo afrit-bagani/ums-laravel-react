@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -158,10 +159,27 @@ class StudentProfileController extends Controller
 
                 $registrationNumber = $batchStartYear.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-                // 2. Insert into student_profiles
+                // 2. Create User
                 DB::insert(
-                    'INSERT INTO student_profiles (registration_number, full_name, father_name, mother_name, gender, dob, abc_id, aadhaar_no, nationality, mobile_no, email, religion, caste, blood_group, marital_status, annual_family_income, parent_mobile_no, is_blind, is_bpl, is_minority, is_ph, present_address, present_city, present_country, present_state, present_district, present_pincode, permanent_address, permanent_city, permanent_country, permanent_state, permanent_district, permanent_pincode, admission_type, exam_name, board_name, institution_name, max_marks, marks_obtained, percentage, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    'INSERT INTO users (name, login_identifier, role, password, is_password_changed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
                     [
+                        $validated['full_name'],
+                        $registrationNumber,
+                        'student',
+                        Hash::make('password'),
+                        false,
+                        $createdAt,
+                        $updatedAt
+                    ]
+                );
+                
+                $userId = DB::getPdo()->lastInsertId();
+
+                // 3. Insert into student_profiles
+                DB::insert(
+                    'INSERT INTO student_profiles (user_id, registration_number, full_name, father_name, mother_name, gender, dob, abc_id, aadhaar_no, nationality, mobile_no, email, religion, caste, blood_group, marital_status, annual_family_income, parent_mobile_no, is_blind, is_bpl, is_minority, is_ph, present_address, present_city, present_country, present_state, present_district, present_pincode, permanent_address, permanent_city, permanent_country, permanent_state, permanent_district, permanent_pincode, admission_type, exam_name, board_name, institution_name, max_marks, marks_obtained, percentage, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    [
+                        $userId,
                         $registrationNumber,
                         $validated['full_name'],
                         $validated['father_name'],

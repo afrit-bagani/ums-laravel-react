@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\Student\StudentProfileController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\StudentLoginController;
+use App\Http\Controllers\Auth\StudentPasswordChangeController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -76,6 +77,12 @@ Route::middleware(['auth', 'can:access-admin-panel'])->group(function () {
 });
 
 Route::middleware(['auth', 'can:access-student-panel'])->group(function () {
-    Route::get('/student/dashboard', StudentDashboardController::class)->name('student.dashboard');
+    Route::get('/student/password/change', [StudentPasswordChangeController::class, 'create'])->name('student.password.change');
+    Route::post('/student/password/change', [StudentPasswordChangeController::class, 'store'])->name('student.password.update');
+
+    Route::middleware('password.changed')->group(function () {
+        Route::get('/student/dashboard', StudentDashboardController::class)->name('student.dashboard');
+    });
+
     Route::post('/student/logout', [StudentLoginController::class, 'destroy'])->name('student.logout');
 });

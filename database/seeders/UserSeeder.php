@@ -16,8 +16,7 @@ class UserSeeder extends Seeder
             'name' => 'Admin 1',
             'login_identifier' => 'admin1@gmail.com',
             'role' => 'admin',
+            'is_password_changed' => true,
         ]);
-
-        User::factory()->count(10)->create();
     }
 }
