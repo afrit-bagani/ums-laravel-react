@@ -95,7 +95,7 @@ class BatchController extends Controller
             [$request->code, $request->name, $request->status, Auth::id(), now(), now()]
         );
 
-        return back()->with('message', 'Batch created successfully.');
+        return back()->with('success', 'Batch created successfully.');
     }
 
     /**
@@ -116,7 +116,7 @@ class BatchController extends Controller
             [$request->code, $request->name, $request->status, now(), $batch_id],
         );
 
-        return back()->with('message', 'Batch updated successfully.');
+        return back()->with('success', 'Batch updated successfully.');
     }
 
     /**
@@ -135,7 +135,7 @@ class BatchController extends Controller
             [$request->status, now(), $batch_id]
         );
 
-        return back()->with('message', 'Batch status changed successfully.');
+        return back()->with('success', 'Batch status changed successfully.');
     }
 
     public function bulkUpdateStatus(Request $request)
@@ -151,6 +151,6 @@ class BatchController extends Controller
 
         DB::update("UPDATE batch_master SET status = ?, updated_at = ? WHERE batch_id IN ($placeholders)", $bindings);
 
-        return back()->with('message', 'Batch status changed successfully.');
+        return back()->with('success', 'Batch status changed successfully.');
     }
 }

@@ -94,7 +94,7 @@ class ProgrammeController extends Controller
             $request->code, $request->name, $request->status, Auth::user()->id, now(), now(),
         ]);
 
-        return back()->with('message', 'Programme created successfully');
+        return back()->with('success', 'Programme created successfully');
     }
 
     /**
@@ -115,7 +115,7 @@ class ProgrammeController extends Controller
             $request->code, $request->name, $request->status, now(), $programme_id,
         ]);
 
-        return back()->with('message', 'Programme updated successfully');
+        return back()->with('success', 'Programme updated successfully');
     }
 
     /**
@@ -134,7 +134,7 @@ class ProgrammeController extends Controller
             $request->status, now(), $programme_id,
         ]);
 
-        return back()->with('message', 'Programme status changed successfully');
+        return back()->with('success', 'Programme status changed successfully');
     }
 
     public function bulkUpdateStatus(Request $request)
@@ -151,6 +151,6 @@ class ProgrammeController extends Controller
             $request->status, now(), ...$request->programme_ids,
         ]);
 
-        return back()->with('message', 'Programme status changed successfully');
+        return back()->with('success', 'Programme status changed successfully');
     }
 }

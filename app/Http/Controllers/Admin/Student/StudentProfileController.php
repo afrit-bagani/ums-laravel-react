@@ -142,7 +142,7 @@ class StudentProfileController extends Controller
             // 1. Generate Registration Number based on Batch Year
             $batchName = DB::selectOne('SELECT name FROM batch_master WHERE id = ?', [$validated['batch_id']]);
             $batchStartYear = $batchName ? (explode('-', $batchName->name)[0] ?? date('Y')) : date('Y');
-            $registrationNumber = $batchStartYear . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            $registrationNumber = $batchStartYear.str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
             // 2. Insert into student_profiles
             DB::insert(
@@ -204,7 +204,7 @@ class StudentProfileController extends Controller
             // 4. Store Documents and Insert into student_documents
             $photoPath = $request->file('photo')->store('documents', 'public');
             $signaturePath = $request->file('signature')->store('documents', 'public');
-            
+
             DB::insert(
                 'INSERT INTO student_documents (student_profile_id, photo, signature, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
                 [$studentId, $photoPath, $signaturePath, $createdAt, $updatedAt]
@@ -233,7 +233,7 @@ class StudentProfileController extends Controller
      */
     public function edit($id)
     {
-        $studentProfile = DB::selectOne("
+        $studentProfile = DB::selectOne('
             SELECT sp.*, 
                    sps.programme_id, sps.course_id, sps.batch_id,
                    sd.photo, sd.signature,
@@ -243,9 +243,9 @@ class StudentProfileController extends Controller
             LEFT JOIN student_documents sd ON sp.id = sd.student_profile_id
             LEFT JOIN student_payments spay ON sp.id = spay.student_profile_id
             WHERE sp.id = ?
-        ", [$id]);
+        ', [$id]);
 
-        if (!$studentProfile) {
+        if (! $studentProfile) {
             abort(404, 'Student not found');
         }
 
@@ -260,7 +260,7 @@ class StudentProfileController extends Controller
         $programmes = [];
         foreach ($programmesWithCourses as $row) {
             $progId = $row->programme_id;
-            if (!isset($programmes[$progId])) {
+            if (! isset($programmes[$progId])) {
                 $programmes[$progId] = [
                     'programme_id' => $progId,
                     'programme_name' => $row->programme_name,

@@ -323,7 +323,7 @@ $request->validate([
             $request->code, $request->name, $request->status, Auth::user()->id, now(), now(),
         ]);
 
-        return back()->with('message', 'Programme created successfully');
+        return back()->with('success', 'Programme created successfully');
 
 $request->validate([
             'search' => ['nullable', 'string', 'max:255'],

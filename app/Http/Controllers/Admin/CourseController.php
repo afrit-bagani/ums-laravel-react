@@ -114,7 +114,7 @@ class CourseController extends Controller
             now(),
         ]);
 
-        return back()->with('message', 'Course created successfully');
+        return back()->with('success', 'Course created successfully');
     }
 
     /**
@@ -136,7 +136,7 @@ class CourseController extends Controller
             $validated['programme_id'], $validated['code'], $validated['name'], $validated['status'], now(), $course_id,
         ]);
 
-        return back()->with('message', 'Course updated successfully');
+        return back()->with('success', 'Course updated successfully');
     }
 
     /**
@@ -157,7 +157,7 @@ class CourseController extends Controller
             $course_id,
         ]);
 
-        return back()->with('message', 'Course status changed successfully');
+        return back()->with('success', 'Course status changed successfully');
     }
 
     public function bulkUpdateStatus(Request $request)
@@ -176,6 +176,6 @@ class CourseController extends Controller
             ...$validated['course_ids'],
         ]);
 
-        return back()->with('message', 'Course status changed successfully');
+        return back()->with('success', 'Course status changed successfully');
     }
 }

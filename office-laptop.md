@@ -76,7 +76,7 @@ Here is what your updated method should look like if you want pure raw performan
             [$request->code, $request->name, $request->status, now(), $batch_id]
         );
 
-        return redirect()->route('admin.batches.index')->with('message', 'Batch updated successfully.');
+        return redirect()->route('admin.batches.index')->with('success', 'Batch updated successfully.');
     }
 ```
 
@@ -283,7 +283,7 @@ You just need to add `->merge()` before the validation. Here is the exact fix fo
             [$request->status, now(), $batch_id]
         );
 
-        return back()->with('message', 'Batch status changed successfully.');
+        return back()->with('success', 'Batch status changed successfully.');
     }
 ```
 
@@ -1134,7 +1134,7 @@ Even if your *database* code is just running an `UPDATE status = 'inactive'`, fr
 public function destroy($programme_id)
 {
     DB::update('UPDATE programme_master SET status = ? WHERE programme_id = ?', ['inactive', $programme_id]);
-    return back()->with('message', 'Programme deleted successfully');
+    return back()->with('success', 'Programme deleted successfully');
 }
 ```
 Laravel's built-in "Soft Deletes" feature actually works exactly like this under the hood! It intercepts a `DELETE` request and turns it into an `UPDATE deleted_at = now()`.

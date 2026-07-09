@@ -159,7 +159,7 @@ class SubjectController extends Controller
             now(),
         ]);
 
-        return redirect()->route('admin.subjects.index')->with('message', 'Subject created successfully');
+        return redirect()->route('admin.subjects.index')->with('success', 'Subject created successfully');
     }
 
     public function show(int $id)
@@ -272,7 +272,7 @@ class SubjectController extends Controller
             $id,
         ]);
 
-        return redirect()->route('admin.subjects.index')->with('message', 'Subject updated successfully');
+        return redirect()->route('admin.subjects.index')->with('success', 'Subject updated successfully');
     }
 
     public function updateStatus(Request $request, int $id)
@@ -288,7 +288,7 @@ class SubjectController extends Controller
             $id,
         ]);
 
-        return redirect()->back()->with('message', 'Subject status updated successfully');
+        return redirect()->back()->with('success', 'Subject status updated successfully');
     }
 
     public function bulkUpdateStatus(Request $request)
@@ -306,6 +306,6 @@ class SubjectController extends Controller
 
         DB::update("UPDATE subject_master SET status = ?, updated_by = ?, updated_at = ? WHERE subject_id IN ($placeholders)", $bindings);
 
-        return redirect()->back()->with('message', 'Selected subjects updated successfully');
+        return redirect()->back()->with('success', 'Selected subjects updated successfully');
     }
 }

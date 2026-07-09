@@ -6,8 +6,8 @@ export default function FlashMessageListner() {
     const { flash } = usePage().props;
 
     useEffect(() => {
-        if (flash?.message) {
-            toast.success(flash.message);
+        if (flash?.success) {
+            toast.success(flash.success);
         }
         if (flash?.error) {
             toast.error(flash.error);

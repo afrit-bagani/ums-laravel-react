@@ -68,9 +68,9 @@ class StudentProfileRequest extends FormRequest
             'percentage' => ['required', 'numeric', 'min:0', 'max:100'],
 
             // Paper Selection
-            'programme_id' => ['required', 'integer'],
-            'course_id' => ['required', 'integer'],
-            'batch_id' => ['required', 'integer'],
+            'programme_id' => ['required', 'integer', Rule::exists('programme_master', 'programme_id')],
+            'course_id' => ['required', 'integer', Rule::exists('course_master', 'course_id')],
+            'batch_id' => ['required', 'integer', Rule::exists('batch_master', 'batch_id')],
 
             // Documents
             'photo' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Student;
 use App\Http\Controllers\Controller;
 use App\Models\StudentDocument;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StudentDocumentController extends Controller
 {
@@ -60,25 +61,25 @@ class StudentDocumentController extends Controller
 
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->store('documents', 'public');
-            $updates[] = "photo = ?";
+            $updates[] = 'photo = ?';
             $bindings[] = $photoPath;
         }
 
         if ($request->hasFile('signature')) {
             $signaturePath = $request->file('signature')->store('documents', 'public');
-            $updates[] = "signature = ?";
+            $updates[] = 'signature = ?';
             $bindings[] = $signaturePath;
         }
 
-        if (!empty($updates)) {
-            $updates[] = "updated_at = ?";
+        if (! empty($updates)) {
+            $updates[] = 'updated_at = ?';
             $bindings[] = now();
-            
+
             $bindings[] = $id;
 
             $setClause = implode(', ', $updates);
-            
-            \Illuminate\Support\Facades\DB::update(
+
+            DB::update(
                 "UPDATE student_documents SET {$setClause} WHERE student_profile_id = ?",
                 $bindings
             );
@@ -86,7 +87,7 @@ class StudentDocumentController extends Controller
 
         return redirect()->back()->with('success', 'Documents updated successfully.');
     }
-     */
+
     public function destroy(StudentDocument $studentDocument)
     {
         //

@@ -32,7 +32,7 @@ class StudentLoginController extends Controller
 
             $name = Auth::user()->name;
 
-            return redirect()->route('student.dashboard')->with('message', "Welcome {$name}");
+            return redirect()->route('student.dashboard')->with('success', "Welcome {$name}");
         }
 
         throw ValidationException::withMessages([
@@ -48,7 +48,7 @@ class StudentLoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('student.login')->with('message', 'You have been loggout successfully');
+        return redirect()->route('student.login')->with('success', 'You have been loggout successfully');
 
     }
 }

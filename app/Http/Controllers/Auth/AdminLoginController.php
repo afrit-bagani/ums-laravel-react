@@ -40,7 +40,7 @@ class AdminLoginController extends Controller
             if ($user && $user->role === 'admin') {
                 $request->session()->regenerate();
 
-                return redirect()->route('admin.batches.index')->with('message', 'Welcome back to Admin Dashboard');
+                return redirect()->route('admin.batches.index')->with('success', 'Welcome back to Admin Dashboard');
             }
             Auth::logout();
         }
@@ -55,6 +55,6 @@ class AdminLoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login')->with('message', 'You have been logged out successfully.');
+        return redirect()->route('admin.login')->with('success', 'You have been logged out successfully.');
     }
 }
