@@ -244,8 +244,8 @@ class StudentProfileController extends Controller
 
                 // 5. Insert into student_payments
                 DB::insert(
-                    'INSERT INTO student_payments (student_profile_id, fee_type, amount, payment_method, transaction_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    [$studentId, $validated['fee_type'], $validated['amount'], $validated['payment_method'], $validated['transaction_id'], $createdAt, $updatedAt]
+                    'INSERT INTO student_payments (student_profile_id, fee_type, amount, payment_method, transaction_id, payment_date, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                    [$studentId, $validated['fee_type'], $validated['amount'], $validated['payment_method'], $validated['transaction_id'], $validated['payment_date'], $createdAt, $updatedAt]
                 );
             });
 
@@ -273,7 +273,7 @@ class StudentProfileController extends Controller
                    spay.amount, 
                    spay.payment_method, 
                    spay.transaction_id, 
-                   spay.created_at as payment_date
+                   spay.payment_date
             FROM student_profiles sp
             LEFT JOIN student_paper_selections sps ON sp.id = sps.student_profile_id
             LEFT JOIN programme_master pm ON sps.programme_id = pm.programme_id
@@ -302,7 +302,7 @@ class StudentProfileController extends Controller
             SELECT sp.*, 
                    sps.programme_id, sps.course_id, sps.batch_id,
                    sd.photo_path AS photo, sd.signature_path AS signature,
-                   spay.fee_type, spay.amount, spay.payment_method, spay.transaction_id
+                   spay.fee_type, spay.amount, spay.payment_method, spay.transaction_id, spay.payment_date
             FROM student_profiles sp
             LEFT JOIN student_paper_selections sps ON sp.id = sps.student_profile_id
             LEFT JOIN student_documents sd ON sp.id = sd.student_profile_id

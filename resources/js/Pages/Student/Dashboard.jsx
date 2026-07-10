@@ -204,13 +204,30 @@ export default function Dashboard({ student }) {
                             </CardHeader>
                             <CardContent className="p-6">
                                 {student.fee_type ? (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 bg-green-50 p-6 rounded-xl border border-green-100">
-                                        <DetailItem label="Fee Type" value={student.fee_type} />
-                                        <DetailItem label="Amount Paid" value={`₹${student.amount}`} />
-                                        <DetailItem label="Payment Method" value={student.payment_method?.toUpperCase()} />
-                                        <DetailItem label="Transaction ID" value={student.transaction_id} />
-                                        <DetailItem label="Payment Date" value={student.payment_date ? new Date(student.payment_date).toLocaleDateString() : 'N/A'} />
-                                    </div>
+                                    <>
+                                        <div className="flex justify-between items-center bg-green-50 p-6 rounded-xl border border-green-100 mb-6">
+                                            <div>
+                                                <h3 className="text-lg font-semibold text-green-900">Payment Successful</h3>
+                                                <p className="text-sm text-green-700">Your registration fee has been successfully processed.</p>
+                                            </div>
+                                            <a 
+                                                href={route('student.payment.receipt')} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg shadow-sm font-medium transition-colors flex items-center gap-2"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                                Download Receipt
+                                            </a>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 bg-gray-50/50 p-6 rounded-xl border border-gray-100">
+                                            <DetailItem label="Fee Type" value={student.fee_type} />
+                                            <DetailItem label="Amount Paid" value={`₹${student.amount}`} />
+                                            <DetailItem label="Payment Method" value={student.payment_method?.toUpperCase()} />
+                                            <DetailItem label="Transaction ID" value={student.transaction_id} />
+                                            <DetailItem label="Payment Date" value={student.payment_date ? new Date(student.payment_date).toLocaleDateString() : 'N/A'} />
+                                        </div>
+                                    </>
                                 ) : (
                                     <div className="text-center p-8 text-gray-500">
                                         No payment records found.

@@ -126,6 +126,7 @@ class StudentProfileSeeder extends Seeder
                 'amount' => 50000.00,
                 'payment_method' => 'upi',
                 'transaction_id' => 'TXN'.rand(1000000000, 9999999999),
+                'payment_date' => now()->subDays(rand(1, 30))->format('Y-m-d'),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

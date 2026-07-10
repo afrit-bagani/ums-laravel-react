@@ -24,7 +24,7 @@ export default function CreateStudent({ programmes_with_courses = [], batches = 
     photo: null, signature: null,
 
     // Payments
-    fee_type: '', amount: '', payment_method: '', transaction_id: ''
+    fee_type: '', amount: '', payment_method: '', transaction_id: '', payment_date: ''
   });
 
   const handleSubmit = (e) => {
@@ -36,7 +36,7 @@ export default function CreateStudent({ programmes_with_courses = [], batches = 
         const basicFields = ['full_name', 'father_name', 'mother_name', 'gender', 'dob', 'abc_id', 'aadhaar_no', 'nationality', 'mobile_no', 'email', 'parent_mobile_no', 'religion', 'caste', 'blood_group', 'marital_status', 'annual_family_income', 'present_address', 'present_city', 'present_district', 'present_state', 'present_country', 'present_pincode', 'permanent_address', 'permanent_city', 'permanent_district', 'permanent_state', 'permanent_country', 'permanent_pincode', 'admission_type', 'exam_name', 'board_name', 'institution_name', 'max_marks', 'marks_obtained', 'percentage'];
         const paperFields = ['programme_id', 'course_id', 'batch_id'];
         const docFields = ['photo', 'signature'];
-        const paymentFields = ['fee_type', 'amount', 'payment_method', 'transaction_id'];
+        const paymentFields = ['fee_type', 'amount', 'payment_method', 'transaction_id', 'payment_date'];
 
         if (basicFields.some(field => errs[field])) {
           setActiveTab("basic-info");

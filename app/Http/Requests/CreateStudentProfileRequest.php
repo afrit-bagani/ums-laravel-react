@@ -81,6 +81,7 @@ class CreateStudentProfileRequest extends FormRequest
             'amount' => ['required', 'numeric', 'min:1'],
             'payment_method' => ['required', 'string'],
             'transaction_id' => ['required', 'string', 'max:255'],
+            'payment_date' => ['required', 'date'],
         ];
     }
 }

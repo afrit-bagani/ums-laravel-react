@@ -15,15 +15,17 @@ class StudentPaymentController extends Controller
             'amount' => ['required', 'numeric', 'min:1'],
             'payment_method' => ['required', 'string'],
             'transaction_id' => ['required', 'string', 'max:255'],
+            'payment_date' => ['required', 'date'],
         ]);
 
         DB::update(
-            'UPDATE student_payments SET fee_type = ?, amount = ?, payment_method = ?, transaction_id = ?, updated_at = ? WHERE student_profile_id = ?',
+            'UPDATE student_payments SET fee_type = ?, amount = ?, payment_method = ?, transaction_id = ?, payment_date = ?, updated_at = ? WHERE student_profile_id = ?',
             [
                 $validated['fee_type'],
                 $validated['amount'],
                 $validated['payment_method'],
                 $validated['transaction_id'],
+                $validated['payment_date'],
                 now(),
                 $id,
             ]

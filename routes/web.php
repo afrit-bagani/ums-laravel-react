@@ -81,7 +81,8 @@ Route::middleware(['auth', 'can:access-student-panel'])->group(function () {
     Route::post('/student/password/change', [StudentPasswordChangeController::class, 'store'])->name('student.password.update');
 
     Route::middleware('password.changed')->group(function () {
-        Route::get('/student/dashboard', StudentDashboardController::class)->name('student.dashboard');
+        Route::get('/student/dashboard', [StudentDashboardController::class, 'index'])->name('student.dashboard');
+        Route::get('/student/payment-receipt/download', [StudentDashboardController::class, 'downloadReceipt'])->name('student.payment.receipt');
     });
 
     Route::post('/student/logout', [StudentLoginController::class, 'destroy'])->name('student.logout');

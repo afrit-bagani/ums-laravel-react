@@ -11,6 +11,7 @@ export default function EditPaymentForm({ studentProfile }) {
     amount: studentProfile?.amount ? studentProfile.amount.toString() : '',
     payment_method: studentProfile?.payment_method || '',
     transaction_id: studentProfile?.transaction_id || '',
+    payment_date: studentProfile?.payment_date || '',
   });
 
   const handleSubmit = (e) => {

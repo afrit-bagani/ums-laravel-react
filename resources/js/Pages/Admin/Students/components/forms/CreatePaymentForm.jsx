@@ -53,6 +53,12 @@ export default function CreatePaymentForm({ data, setData, errors, processing, b
             <Input type="text" placeholder="Enter transaction ID" value={data.transaction_id} onChange={(e) => setData('transaction_id', e.target.value)} />
             {errors.transaction_id && <ErrorAlert title={errors.transaction_id} />}
           </div>
+
+          <div className="space-y-2">
+            <Label>Payment Date <span className="text-red-500">*</span></Label>
+            <Input type="date" value={data.payment_date || ''} onChange={(e) => setData('payment_date', e.target.value)} />
+            {errors.payment_date && <ErrorAlert title={errors.payment_date} />}
+          </div>
         </div>
       </div>
 

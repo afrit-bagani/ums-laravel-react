@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('amount', 8, 2);
             $table->enum('payment_method', ['cash', 'upi', 'cheque', 'NEFT', 'RTGS']);
             $table->string('transaction_id')->nullable();
+            $table->date('payment_date')->nullable();
             $table->timestamps();
         });
     }
