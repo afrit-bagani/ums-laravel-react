@@ -97,3 +97,15 @@ This file tracks the ongoing features, refactoring, and UI enhancements made to 
 ### 🎨 Student Experience & Dashboard
 - **Read-Only Data Architecture:** Engineered `StudentDashboardController` to execute a comprehensive, high-performance raw SQL `LEFT JOIN` query (similar to the admin's `Show` logic) that securely fetches the authenticated student's full profile, academic placement, documents, and payment history based on their `user_id`.
 - **Premium Dashboard UI:** Built the `Dashboard.jsx` interface utilizing the premium Shadcn UI tabbed layout. The view offers a beautiful, responsive, and categorized presentation of the student's data mimicking the high-quality aesthetics of the admin portal, complete with a dedicated header and logout workflow.
+
+## [2026-07-10] PDF Receipt Generation & Frontend Routing Fixes
+
+### 📄 PDF Generation Architecture
+- **Robust PDF Engine:** Integrated `barryvdh/laravel-dompdf` to generate downloadable payment receipts. Experimented with headless browsers (`Spatie Browsershot`) for Tailwind support, but opted to revert to `dompdf` for its zero-dependency reliability and superior performance on local Windows/Herd environments.
+- **Table-Based Layout Refactoring:** Completely rewrote the `receipt.blade.php` template using a classic HTML `<table>` architecture and strict inline CSS to bypass `dompdf`'s lack of support for CSS Grid, Flexbox, and external stylesheets (Vite/Tailwind).
+- **CSS Clipping Fixes:** Resolved a text-clipping bug where `overflow: hidden` on a container caused `dompdf` to slice absolutely positioned title headers in half. 
+- **Timezone Localization:** Corrected the global application timezone in `config/app.php` to `'Asia/Kolkata'` to ensure all PDF footer timestamps match the user's local Indian Standard Time instead of defaulting to UTC.
+
+### ⚙️ Routing & Auth Optimization
+- **Ziggy Route Propagation:** Fixed a fatal React application crash on the frontend by running `php artisan ziggy:generate`. This successfully propagated newly created backend download routes (`student.payment.receipt`) to the Inertia/React client, preventing undefined route exceptions.
+- **Optimized Admin Auth:** Refactored `AdminLoginController` to use a cleaner, single-line conditional check (`Auth::attempt($credentials) && Auth::user()->role === 'Admin'`), improving readability and execution flow without sacrificing security.
