@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
@@ -28,11 +29,12 @@ class StudentLoginController extends Controller
         ];
 
         if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+            if (Auth::user()->role === 'student') {
+                $request->session()->regenerate();
+                return redirect()->route('student.dashboard')->with('success', "Welcome " . Auth::user()->name);
+            }
 
-            $name = Auth::user()->name;
-
-            return redirect()->route('student.dashboard')->with('success', "Welcome {$name}");
+            Auth::logout();
         }
 
         throw ValidationException::withMessages([

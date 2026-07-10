@@ -4,6 +4,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Link } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
+import ErrorAlert from "./ErrorAlert";
 
 export function LoginForm({
     className,
@@ -47,7 +48,7 @@ export function LoginForm({
                     </Field>
                     :
                     <Field>
-                        <FieldLabel htmlFor="text">Registratio No</FieldLabel>
+                        <FieldLabel htmlFor="text">Registration No</FieldLabel>
                         <Input
                             id="login_identifier"
                             type="text"
@@ -65,6 +66,7 @@ export function LoginForm({
                         <FieldLabel htmlFor="password">Password</FieldLabel>
                         <Link
                             // href={isAdmin ? route('admin.forgot-password') : route('student.forgot-password')}
+                            href={'#'}
                             className="ml-auto text-sm underline-offset-4 hover:underline"
                         >
                             Forgot your password?
@@ -80,6 +82,7 @@ export function LoginForm({
                         className="bg-background"
                     />
                 </Field>
+                {errors.error && <ErrorAlert title={errors.error} />}
                 <Field>
                     <Button type="submit" disabled={processing}>
                         {processing ? 'Logging in..' : 'Login'}

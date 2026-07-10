@@ -1,9 +1,7 @@
 import { useForm } from "@inertiajs/react";
-
 import { useRoute } from "ziggy-js";
 import { LoginForm } from "@/components/login-form";
 import Logo from "@/components/AppLogoIcon";
-import FlashMessageListner from "@/components/FlashMessageListner";
 
 export default function Login() {
     const { data, setData, errors, post, processing } = useForm({
@@ -19,8 +17,6 @@ export default function Login() {
     }
 
     return (
-        <>
-        <FlashMessageListner />
         <div className="grid min-h-svh lg:grid-cols-2">
             <div className="flex flex-col gap-4 p-6 md:p-10">
                 <div className="flex justify-center gap-2 md:justify-start">
@@ -46,6 +42,5 @@ export default function Login() {
                 />
             </div>
         </div>
-        </>
     );
 }

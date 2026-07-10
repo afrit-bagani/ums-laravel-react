@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class AdminLoginController extends Controller
@@ -28,24 +28,18 @@ class AdminLoginController extends Controller
         ];
 
         if (Auth::attempt($credentials)) {
-            $userId = Auth::id();
-
-            $user = DB::selectOne('
-                SELECT role
-                FROM users
-                WHERE id = ?
-                LIMIT 1
-            ', [$userId]);
-
-            if ($user && $user->role === 'admin') {
+            if (Auth::user()->role === 'admin') {
                 $request->session()->regenerate();
 
                 return redirect()->route('admin.batches.index')->with('success', 'Welcome back to Admin Dashboard');
             }
+
             Auth::logout();
         }
 
-        return back()->with('error', 'Invalid email or password.');
+        throw ValidationException::withMessages([
+            'error' => 'Invalid email or password.',
+        ]);
     }
 
     public function destroy(Request $request)
