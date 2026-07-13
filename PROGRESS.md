@@ -109,3 +109,22 @@ This file tracks the ongoing features, refactoring, and UI enhancements made to 
 ### ⚙️ Routing & Auth Optimization
 - **Ziggy Route Propagation:** Fixed a fatal React application crash on the frontend by running `php artisan ziggy:generate`. This successfully propagated newly created backend download routes (`student.payment.receipt`) to the Inertia/React client, preventing undefined route exceptions.
 - **Optimized Admin Auth:** Refactored `AdminLoginController` to use a cleaner, single-line conditional check (`Auth::attempt($credentials) && Auth::user()->role === 'Admin'`), improving readability and execution flow without sacrificing security.
+
+## [2026-07-13] Email Integration, Password Management & Security
+
+### 📧 SMTP & Email Verification
+- **SMTP Configuration:** Corrected the `.env` configuration for Gmail SMTP, explicitly ensuring that `MAIL_USERNAME` matches the full sender address (`MAIL_FROM_ADDRESS`) to successfully bypass Google's `535 5.7.8` authentication rejection.
+- **Welcome Emails:** Fully enabled the automated welcome email dispatch in `StudentProfileController@store` when an admin creates a student profile, securely transmitting their auto-generated registration number and temporary password.
+
+### 🔐 Password Change & Management
+- **Admin Password Management:** Implemented an `AdminPasswordChangeController` and a dedicated React view. Admins can securely change their passwords from the dashboard without being trapped by the `EnsurePasswordIsChanged` middleware.
+- **Security Best Practices:** Enforced strict session invalidation upon an admin changing their password (`Auth::logout()`, `$request->session()->invalidate()`, `$request->session()->regenerateToken()`), forcing a clean re-authentication flow.
+- **UI Streamlining:** Refined the Admin Sidebar UI, moving the "Change Password" action out of the main menu list and transforming it into a sleek icon button directly next to the "Logout" button in the bottom user profile section.
+- **Dynamic Profile Avatars:** Updated the Admin Sidebar to dynamically pull the authenticated user's name and role from the Inertia `usePage().props`, displaying their true initial rather than a static "AD".
+
+### 🔑 Forgot Password Architecture
+- **Unified Email Template:** Created a reusable `ForgotPasswordEmail` mailable and Blade template that handles password resets for both Students and Admins.
+- **Role-Specific Backend Controllers:** 
+  - Engineered `StudentForgotPasswordController` to accept a Registration Number, verify the user account, and uniquely query the `student_profiles` table to dispatch the email to their actual personal address.
+  - Engineered `AdminForgotPasswordController` to directly query and dispatch to the admin's email (`login_identifier`).
+- **Forced Password Reset Pipeline:** Architected the forgot password flow to securely generate a random 10-character temporary password, immediately hash it, and reset the user's `is_password_changed` flag to `false`. This guarantees that upon using the temporary password, the user is instantly trapped by the middleware and forced to set a permanent, private password.
