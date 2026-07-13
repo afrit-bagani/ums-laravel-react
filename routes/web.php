@@ -9,8 +9,11 @@ use App\Http\Controllers\Admin\Student\StudentPaymentController;
 use App\Http\Controllers\Admin\Student\StudentProfileController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\Auth\AdminPasswordChangeController;
+use App\Http\Controllers\Auth\AdminForgotPasswordController;
 use App\Http\Controllers\Auth\StudentLoginController;
 use App\Http\Controllers\Auth\StudentPasswordChangeController;
+use App\Http\Controllers\Auth\StudentForgotPasswordController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -20,12 +23,22 @@ Route::middleware('guest')->group(function () {
 
     Route::get('student/login', [StudentLoginController::class, 'create'])->name('student.login');
     Route::post('student/login', [StudentLoginController::class, 'store'])->name('student.login.store');
+    
+    Route::get('student/forgot-password', [StudentForgotPasswordController::class, 'create'])->name('student.password.request');
+    Route::post('student/forgot-password', [StudentForgotPasswordController::class, 'store'])->name('student.password.email');
 
     Route::get('/admin/login', [AdminLoginController::class, 'create'])->name('admin.login');
     Route::post('/admin/login', [AdminLoginController::class, 'store'])->name('admin.login.store');
+
+    Route::get('/admin/forgot-password', [AdminForgotPasswordController::class, 'create'])->name('admin.password.request');
+    Route::post('/admin/forgot-password', [AdminForgotPasswordController::class, 'store'])->name('admin.password.email');
 });
 
 Route::middleware(['auth', 'can:access-admin-panel'])->group(function () {
+    // Admin Password Change
+    Route::get('/admin/password/change', [AdminPasswordChangeController::class, 'create'])->name('admin.password.change');
+    Route::post('/admin/password/change', [AdminPasswordChangeController::class, 'store'])->name('admin.password.update');
+
     // Batches
     Route::get('/admin/batches', [BatchController::class, 'index'])->name('admin.batches.index');
     Route::post('/admin/batches', [BatchController::class, 'store'])->name('admin.batches.store');

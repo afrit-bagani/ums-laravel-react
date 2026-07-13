@@ -65,8 +65,7 @@ export function LoginForm({
                     <div className="flex items-center">
                         <FieldLabel htmlFor="password">Password</FieldLabel>
                         <Link
-                            // href={isAdmin ? route('admin.forgot-password') : route('student.forgot-password')}
-                            href={'#'}
+                            href={isAdmin ? route('admin.password.request') : route('student.password.request')}
                             className="ml-auto text-sm underline-offset-4 hover:underline"
                         >
                             Forgot your password?
