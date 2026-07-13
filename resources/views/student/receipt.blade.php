@@ -189,7 +189,7 @@
                     <td class="uppercase">{{ $student->full_name }}</td>
                 </tr>
                 <tr>
-                    <td class="details-label">UID No.</td>
+                    <td class="details-label">Registration No.</td>
                     <td class="details-colon">:</td>
                     <td>{{ $student->registration_number }}</td>
                 </tr>
@@ -231,7 +231,7 @@
                 <tr>
                     <td class="details-label">Drawn On</td>
                     <td class="details-colon">:</td>
-                    <td class="uppercase">{{ $student->payment_method ?? 'N/A' }} (Online)</td>
+                    <td class="uppercase">{{ $student->payment_method ?? 'N/A' }}</td>
                 </tr>
                 <tr>
                     <td class="details-label">Instrument Dt</td>

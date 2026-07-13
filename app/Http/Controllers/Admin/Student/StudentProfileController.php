@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateStudentProfileRequest;
 use App\Http\Requests\UpdateStudentProfileRequest;
 use Exception;
+use App\Mail\StudentWelcomeEmail;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -159,6 +162,8 @@ class StudentProfileController extends Controller
 
                 $registrationNumber = $batchStartYear.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
+                $temporaryPassword = Str::random(10);
+
                 // 2. Create User
                 DB::insert(
                     'INSERT INTO users (name, login_identifier, role, password, is_password_changed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
@@ -166,7 +171,7 @@ class StudentProfileController extends Controller
                         $validated['full_name'],
                         $registrationNumber,
                         'student',
-                        Hash::make('password'),
+                        Hash::make($temporaryPassword),
                         false,
                         $createdAt,
                         $updatedAt
@@ -246,6 +251,11 @@ class StudentProfileController extends Controller
                 DB::insert(
                     'INSERT INTO student_payments (student_profile_id, fee_type, amount, payment_method, transaction_id, payment_date, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                     [$studentId, $validated['fee_type'], $validated['amount'], $validated['payment_method'], $validated['transaction_id'], $validated['payment_date'], $createdAt, $updatedAt]
+                );
+
+                // 6. Dispatch Welcome Email
+                Mail::to($validated['email'])->send(
+                    new StudentWelcomeEmail($validated['full_name'], $registrationNumber, $temporaryPassword)
                 );
             });
 
