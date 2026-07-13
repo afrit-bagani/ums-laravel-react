@@ -8,14 +8,18 @@ import {
     Library,
     BookOpen,
     Users,
-    LogOut
+    LogOut,
+    KeyRound
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRoute } from 'ziggy-js';
 
 
 export default function Sidebar() {
-    const { url } = usePage();
+    const { url, props } = usePage();
+    const { auth } = props;
+    const user = auth?.user;
+
     const route = useRoute();
 
     const menuItems = [
@@ -66,16 +70,21 @@ export default function Sidebar() {
 
             <div className="p-3 border-t border-gray-200">
                 <div className="flex items-center gap-3 px-2 py-1">
-                    <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-[10px]">
-                        AD
+                    <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-[12px] uppercase shrink-0">
+                        {user?.name?.charAt(0) || 'A'}
                     </div>
-                    <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-900">Administrator</span>
-                        <span className="text-xs text-gray-500">System Access</span>
+                    <div className="flex flex-col flex-1 min-w-0">
+                        <span className="text-sm font-medium text-gray-900 truncate">{user?.name}</span>
+                        <span className="text-[10px] text-gray-500 truncate uppercase tracking-wider">{user?.role}</span>
                     </div>
-                    <Button variant="destructive" asChild>
-                        <Link href={route('admin.logout')} method="post" as="button" title='Logout'><LogOut /></Link>
-                    </Button>
+                    <div className="flex items-center gap-1 shrink-0">
+                        <Button variant="ghost" size="icon" asChild className="h-8 w-8 text-gray-500 hover:text-gray-900" title="Change Password">
+                            <Link href={route('admin.password.change')}><KeyRound className="h-4 w-4" /></Link>
+                        </Button>
+                        <Button variant="ghost" size="icon" asChild className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50" title="Logout">
+                            <Link href={route('admin.logout')} method="post" as="button"><LogOut className="h-4 w-4" /></Link>
+                        </Button>
+                    </div>
                 </div>
             </div>
         </aside>
