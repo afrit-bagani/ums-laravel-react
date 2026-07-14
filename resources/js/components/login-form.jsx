@@ -35,7 +35,7 @@ export function LoginForm({
                 </div>
                 {isAdmin ?
                     <Field>
-                        <FieldLabel htmlFor="email">Email</FieldLabel>
+                        <FieldLabel htmlFor="login_identifier">Email</FieldLabel>
                         <Input
                             id="login_identifier"
                             type="email"
@@ -48,7 +48,7 @@ export function LoginForm({
                     </Field>
                     :
                     <Field>
-                        <FieldLabel htmlFor="text">Registration No</FieldLabel>
+                        <FieldLabel htmlFor="login_identifier">Registration No</FieldLabel>
                         <Input
                             id="login_identifier"
                             type="text"
