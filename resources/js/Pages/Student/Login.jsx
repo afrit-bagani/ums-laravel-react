@@ -1,4 +1,4 @@
-import { useForm } from "@inertiajs/react";
+import { Link, useForm } from "@inertiajs/react";
 
 import { useRoute } from "ziggy-js";
 import { LoginForm } from "@/components/login-form";
