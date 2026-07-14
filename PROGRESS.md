@@ -128,3 +128,19 @@ This file tracks the ongoing features, refactoring, and UI enhancements made to 
   - Engineered `StudentForgotPasswordController` to accept a Registration Number, verify the user account, and uniquely query the `student_profiles` table to dispatch the email to their actual personal address.
   - Engineered `AdminForgotPasswordController` to directly query and dispatch to the admin's email (`login_identifier`).
 - **Forced Password Reset Pipeline:** Architected the forgot password flow to securely generate a random 10-character temporary password, immediately hash it, and reset the user's `is_password_changed` flag to `false`. This guarantees that upon using the temporary password, the user is instantly trapped by the middleware and forced to set a permanent, private password.
+
+## [2026-07-14] Repository Pattern Refactoring & Applicant Registration Workflow
+
+### 🚀 Repository Pattern Implementation (Admin/Core Modules)
+- **Architecture Shift:** Refactored all major Admin-facing modules (Batch, Programme, Course, Subject, and Student modules) out of "Fat Controllers" and into dedicated `Repository` classes to completely isolate database logic and improve code maintainability.
+- **Constructor Injection:** Updated all core controllers to use Laravel's constructor dependency injection (e.g. `protected SubjectRepository $subjectRepo;`) ensuring loose coupling.
+- **Namespace Alignment Fixes:** Corrected strict PSR-4 namespacing issues where `App\Repositories\Admin` files were missing the `\Admin` namespace declaration, resolving fatal "Class not found" crashes during the refactoring process.
+
+### 🎓 Applicant Registration Portal (Public Facing)
+- **Applicant Schema Orchestration:** Designed and migrated 4 dedicated database tables (`applicant_profiles`, `applicant_paper_selections`, `applicant_documents`, `applicant_payments`) mirroring the structure of the internal student tables but strictly isolating external applicants. Removed the `user_id` foreign key as applicants are independent, non-authenticated entities.
+- **Atomic DB Transactions:** Created `ApplicantRepository@createApplicant` which orchestrates a massive 4-table raw SQL insertion inside a `DB::transaction`. If any step (such as photo upload or payment details) fails, the entire application gracefully rolls back to prevent orphaned records.
+- **Intelligent Unique ID Generation:** Engineered `ApplicantController` to securely validate all 4 tiers of applicant data and automatically generate a unique, trackable `applicant_code` in the format `APP-YYYY-XXXXXX` (e.g., `APP-2026-X9A34B`) upon a successful submission.
+- **Premium Public UI (Inertia):** Built a gorgeous, responsive, 4-step wizard interface at `/applicant/apply` using Shadcn Tabs.
+  - **Smart Validation Routing:** Bound Inertia's `onError` callback to detect exactly which fields failed validation and automatically force the UI to jump to the corresponding tab (Profile, Academic, Document, or Payment).
+  - **Component Integration:** Leveraged the custom `<ErrorAlert>` component globally across the registration form to provide a polished, unified error presentation.
+  - **Success Modal:** Designed a crisp success modal that prominently displays the auto-generated `applicant_code` and explicitly instructs the user to save it for future references.
