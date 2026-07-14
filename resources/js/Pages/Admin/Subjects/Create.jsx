@@ -18,12 +18,12 @@ export default function CreateSubject({ programmes_with_courses }) {
     code: '',
     name: '',
     status: 'active',
-    internal_full_marks: '0',
-    internal_pass_marks: '0',
-    theory_full_marks: '0',
-    theory_pass_marks: '0',
-    practical_full_marks: '0',
-    practical_pass_marks: '0',
+    internal_full_marks: '',
+    internal_pass_marks: '',
+    theory_full_marks: '',
+    theory_pass_marks: '',
+    practical_full_marks: '',
+    practical_pass_marks: '',
   });
 
   const selectedProgramme = programmes_with_courses.find(p => p.programme_id == data.programme_id);
@@ -83,7 +83,7 @@ export default function CreateSubject({ programmes_with_courses }) {
                     <SelectGroup>
                       {availableCourses.map(course => (
                         <SelectItem key={course.course_id} value={course.course_id.toString()}>
-                          {course.name}
+                          {course.course_name}
                         </SelectItem>
                       ))}
                     </SelectGroup>

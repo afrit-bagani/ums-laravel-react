@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, useForm } from '@inertiajs/react';
+import { toast } from 'sonner';
 import { useRoute } from 'ziggy-js';
 import AdminDashboardLayout from "@/Pages/Layouts/Admin/AdminDashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,7 +14,7 @@ export default function CreateStudent({ programmes_with_courses = [], batches = 
   const route = useRoute();
   const [activeTab, setActiveTab] = useState("basic-info");
 
-  const { data, setData, post, processing, errors } = useForm({
+  const { data, setData, post, processing, errors, hasErrors } = useForm({
     // Basic Info
     full_name: '', father_name: '', mother_name: '', gender: '', dob: '', abc_id: '', aadhaar_no: '', nationality: 'Indian', mobile_no: '', email: '', parent_mobile_no: '', religion: '', caste: '', blood_group: '', marital_status: '', annual_family_income: '', is_blind: false, is_bpl: false, is_minority: false, is_ph: false, present_address: '', present_city: '', present_district: '', present_state: '', present_country: 'India', present_pincode: '', permanent_address: '', permanent_city: '', permanent_district: '', permanent_state: '', permanent_country: 'India', permanent_pincode: '', admission_type: '', exam_name: '', board_name: '', institution_name: '', max_marks: '', marks_obtained: '', percentage: '',
 
@@ -27,27 +28,28 @@ export default function CreateStudent({ programmes_with_courses = [], batches = 
     fee_type: '', amount: '', payment_method: '', transaction_id: '', payment_date: ''
   });
 
+  useEffect(() => {
+    if (hasErrors) {
+      toast.error("Please fix the errors in the form before submitting.");
+
+      const basicFields = ['full_name', 'father_name', 'mother_name', 'gender', 'dob', 'abc_id', 'aadhaar_no', 'nationality', 'mobile_no', 'email', 'parent_mobile_no', 'religion', 'caste', 'blood_group', 'marital_status', 'annual_family_income', 'present_address', 'present_city', 'present_district', 'present_state', 'present_country', 'present_pincode', 'permanent_address', 'permanent_city', 'permanent_district', 'permanent_state', 'permanent_country', 'permanent_pincode', 'admission_type', 'exam_name', 'board_name', 'institution_name', 'max_marks', 'marks_obtained', 'percentage'];
+      const paperFields = ['programme_id', 'course_id', 'batch_id'];
+      const docFields = ['photo', 'signature'];
+      const paymentFields = ['fee_type', 'amount', 'payment_method', 'transaction_id', 'payment_date'];
+
+      const errorKeys = Object.keys(errors);
+
+      if (errorKeys.some(k => basicFields.includes(k))) setActiveTab('basic-info');
+      else if (errorKeys.some(k => paperFields.includes(k))) setActiveTab('paper-selection');
+      else if (errorKeys.some(k => docFields.includes(k))) setActiveTab('documents');
+      else if (errorKeys.some(k => paymentFields.includes(k))) setActiveTab('payment');
+    }
+  }, [errors, hasErrors]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     post(route('admin.students.store'), {
-      preserveScroll: true,
-      onError: (errs) => {
-        // Tab switching logic on error
-        const basicFields = ['full_name', 'father_name', 'mother_name', 'gender', 'dob', 'abc_id', 'aadhaar_no', 'nationality', 'mobile_no', 'email', 'parent_mobile_no', 'religion', 'caste', 'blood_group', 'marital_status', 'annual_family_income', 'present_address', 'present_city', 'present_district', 'present_state', 'present_country', 'present_pincode', 'permanent_address', 'permanent_city', 'permanent_district', 'permanent_state', 'permanent_country', 'permanent_pincode', 'admission_type', 'exam_name', 'board_name', 'institution_name', 'max_marks', 'marks_obtained', 'percentage'];
-        const paperFields = ['programme_id', 'course_id', 'batch_id'];
-        const docFields = ['photo', 'signature'];
-        const paymentFields = ['fee_type', 'amount', 'payment_method', 'transaction_id', 'payment_date'];
-
-        if (basicFields.some(field => errs[field])) {
-          setActiveTab("basic-info");
-        } else if (paperFields.some(field => errs[field])) {
-          setActiveTab("paper-selection");
-        } else if (docFields.some(field => errs[field])) {
-          setActiveTab("documents");
-        } else if (paymentFields.some(field => errs[field])) {
-          setActiveTab("payment");
-        }
-      }
+      preserveScroll: true
     });
   };
 
@@ -59,6 +61,17 @@ export default function CreateStudent({ programmes_with_courses = [], batches = 
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">Student Registration Wizard</h1>
         <p className="text-gray-500 mt-1">Complete the 4-step process to enroll a new student.</p>
       </div>
+
+      {hasErrors && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <h4 className="text-red-700 font-semibold mb-2">Please fix the following errors:</h4>
+          <ul className="list-disc list-inside text-sm text-red-600 space-y-1">
+            {Object.entries(errors).map(([field, message]) => (
+              <li key={field}>{message}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

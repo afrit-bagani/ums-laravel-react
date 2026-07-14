@@ -89,7 +89,7 @@ class SubjectRepository
         foreach ($courses as $course) {
             $groupedCourses[$course->programme_id][] = [
                 'course_id' => $course->course_id,
-                'name' => $course->course_name,
+                'course_name' => $course->course_name,
             ];
         }
 
@@ -108,15 +108,15 @@ class SubjectRepository
     /**
      * Create a new subject.
      */
-    public function createSubject(array $data, int $createdBy, string $createdAt, string $updatedAt)
+    public function createSubject(array $data, int $createdBy, int $updatedBy, string $createdAt, string $updatedAt)
     {
         DB::insert('INSERT INTO subject_master (
             programme_id, course_id, code, name, status, 
             internal_full_marks, internal_pass_marks, 
             theory_full_marks, theory_pass_marks, 
             practical_full_marks, practical_pass_marks, 
-            created_by, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+            created_by, updated_by, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
             $data['programme_id'],
             $data['course_id'],
             $data['code'],
@@ -129,6 +129,7 @@ class SubjectRepository
             $data['practical_full_marks'],
             $data['practical_pass_marks'],
             $createdBy,
+            $updatedBy,
             $createdAt,
             $updatedAt,
         ]);

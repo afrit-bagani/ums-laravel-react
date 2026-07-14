@@ -83,7 +83,7 @@ export default function EditSubject({ subject, programmes_with_courses }) {
                     <SelectGroup>
                       {availableCourses.map(course => (
                         <SelectItem key={course.course_id} value={course.course_id.toString()}>
-                          {course.name}
+                          {course.course_name}
                         </SelectItem>
                       ))}
                     </SelectGroup>

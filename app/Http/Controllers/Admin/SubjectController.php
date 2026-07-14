@@ -89,6 +89,7 @@ class SubjectController extends Controller
         $this->subjectRepo->createSubject(
             $validated,
             Auth::id(),
+            Auth::id(),
             now(),
             now()
         );
@@ -110,7 +111,7 @@ class SubjectController extends Controller
     public function edit(int $id)
     {
         $subject = $this->subjectRepo->getSubjectById($id);
-        
+
         $programmesWithCourses = Cache::rememberForever('active_programmes_with_courses', function () {
             return $this->subjectRepo->getActiveProgrammesAndCourses();
         });
