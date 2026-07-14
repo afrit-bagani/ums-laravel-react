@@ -3,11 +3,18 @@
 namespace App\Http\Controllers\Admin\Student;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\Admin\StudentRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class StudentPaymentController extends Controller
 {
+    protected StudentRepository $studentRepo;
+
+    public function __construct(StudentRepository $studentRepo)
+    {
+        $this->studentRepo = $studentRepo;
+    }
+
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
@@ -18,18 +25,7 @@ class StudentPaymentController extends Controller
             'payment_date' => ['required', 'date'],
         ]);
 
-        DB::update(
-            'UPDATE student_payments SET fee_type = ?, amount = ?, payment_method = ?, transaction_id = ?, payment_date = ?, updated_at = ? WHERE student_profile_id = ?',
-            [
-                $validated['fee_type'],
-                $validated['amount'],
-                $validated['payment_method'],
-                $validated['transaction_id'],
-                $validated['payment_date'],
-                now(),
-                $id,
-            ]
-        );
+        $this->studentRepo->updateStudentPayment($id, $validated, now());
 
         return redirect()->back()->with('success', 'Payment details updated successfully.');
     }

@@ -3,15 +3,22 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\Admin\ProgrammeRepository;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class ProgrammeController extends Controller
 {
+    protected ProgrammeRepository $programmeRepo;
+
+    public function __construct(ProgrammeRepository $programmeRepo)
+    {
+        $this->programmeRepo = $programmeRepo;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -31,39 +38,8 @@ class ProgrammeController extends Controller
 
         $offset = ($currentPage - 1) * $perPage;
 
-        $whereClauses = [];
-        $bindings = [];
-
-        // search filter
-        if (! empty($search)) {
-            $whereClauses[] = '(code LIKE ? OR name LIKE ?)';
-            $bindings[] = "%{$search}%";
-            $bindings[] = "%{$search}%";
-        }
-
-        // status filter
-        if ($status !== null && $status !== 'all') {
-            $whereClauses[] = 'status = ?';
-            $bindings[] = $status;
-        }
-
-        $query = '';
-
-        if (count($whereClauses) > 0) {
-            $query = 'WHERE '.implode(' AND ', $whereClauses); // final query string
-        }
-
-        $dataBindings = array_merge($bindings, [$perPage, $offset]);
-
-        $programmes = DB::select(
-            "SELECT * from programme_master $query ORDER BY programme_id ASC LIMIT ? OFFSET ? ",
-            $dataBindings
-        );
-
-        $totalRecords = DB::selectOne(
-            "SELECT COUNT(*) as count FROM programme_master $query",
-            $bindings
-        )->count;
+        $programmes = $this->programmeRepo->getPaginatedProgrammes($search, $status, $perPage, $offset);
+        $totalRecords = $this->programmeRepo->getTotalProgrammesCount($search, $status);
 
         $paginator = new LengthAwarePaginator(
             $programmes,
@@ -90,9 +66,12 @@ class ProgrammeController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        DB::insert('INSERT INTO programme_master (code, name, status, created_by, created_at, updated_at) VALUES (?,?,?,?,?,?)', [
-            $request->code, $request->name, $request->status, Auth::user()->id, now(), now(),
-        ]);
+        $this->programmeRepo->createProgramme(
+            $request->only(['code', 'name', 'status']),
+            Auth::id(),
+            now(),
+            now()
+        );
 
         return back()->with('success', 'Programme created successfully');
     }
@@ -100,7 +79,7 @@ class ProgrammeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $programme_id)
+    public function update(Request $request, int $programme_id)
     {
         $request->merge(['programme_id' => $programme_id]);
 
@@ -111,9 +90,11 @@ class ProgrammeController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        DB::update('UPDATE programme_master SET code = ? , name = ? , status = ?, updated_at = ? WHERE programme_id = ?', [
-            $request->code, $request->name, $request->status, now(), $programme_id,
-        ]);
+        $this->programmeRepo->updateProgramme(
+            $programme_id,
+            $request->only(['code', 'name', 'status']),
+            now()
+        );
 
         return back()->with('success', 'Programme updated successfully');
     }
@@ -121,7 +102,7 @@ class ProgrammeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function updateStatus(Request $request, $programme_id)
+    public function updateStatus(Request $request, int $programme_id)
     {
         $request->merge(['programme_id' => $programme_id]);
 
@@ -130,9 +111,11 @@ class ProgrammeController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        DB::update('UPDATE programme_master SET status = ?, updated_at = ? WHERE programme_id = ?', [
-            $request->status, now(), $programme_id,
-        ]);
+        $this->programmeRepo->updateProgrammeStatus(
+            $programme_id,
+            $request->status,
+            now()
+        );
 
         return back()->with('success', 'Programme status changed successfully');
     }
@@ -145,11 +128,11 @@ class ProgrammeController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        $placeholders = implode(',', array_fill(0, count($request->programme_ids), '?'));
-
-        DB::update("UPDATE programme_master SET status = ? , updated_at = ? WHERE programme_id IN ($placeholders)", [
-            $request->status, now(), ...$request->programme_ids,
-        ]);
+        $this->programmeRepo->bulkUpdateProgrammeStatus(
+            $request->programme_ids,
+            $request->status,
+            now()
+        );
 
         return back()->with('success', 'Programme status changed successfully');
     }

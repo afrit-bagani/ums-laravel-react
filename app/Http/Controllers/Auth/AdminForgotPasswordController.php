@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Mail\ForgotPasswordEmail;
+use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -13,6 +13,13 @@ use Inertia\Inertia;
 
 class AdminForgotPasswordController extends Controller
 {
+    protected $userRepo;
+
+    public function __construct(UserRepository $userRepo)
+    {
+        $this->userRepo = $userRepo;
+    }
+
     public function create()
     {
         return Inertia::render('Admin/ForgotPassword');
@@ -24,10 +31,7 @@ class AdminForgotPasswordController extends Controller
             'login_identifier' => ['required', 'string', 'email'],
         ]);
 
-        $user = DB::table('users')
-            ->where('role', 'admin')
-            ->where('login_identifier', $request->login_identifier)
-            ->first();
+        $user = $this->userRepo->findByRoleAndIdentifier('admin', $request->login_identifier);
 
         if (! $user) {
             return back()->withErrors(['error' => 'No admin account found with this email address.']);
@@ -35,11 +39,11 @@ class AdminForgotPasswordController extends Controller
 
         $temporaryPassword = Str::random(10);
 
-        DB::table('users')->where('id', $user->id)->update([
-            'password' => Hash::make($temporaryPassword),
-            'is_password_changed' => false,
-            'updated_at' => now(),
-        ]);
+        $this->userRepo->updatePassword(
+            $user->id,
+            Hash::make($temporaryPassword),
+            false
+        );
 
         Mail::to($user->login_identifier)->send(
             new ForgotPasswordEmail(

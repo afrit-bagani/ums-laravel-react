@@ -3,16 +3,23 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\Admin\CourseRepository;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class CourseController extends Controller
 {
+    protected CourseRepository $courseRepo;
+
+    public function __construct(CourseRepository $courseRepo)
+    {
+        $this->courseRepo = $courseRepo;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -31,45 +38,10 @@ class CourseController extends Controller
         $currentPage = $validated['page'] ?? 1;
         $perPage = $validated['rows-per-page'] ?? 10;
 
-        $whereClause = [];
-        $bindings = [];
-
-        // search filter
-        if (! empty($search)) {
-            $whereClause[] = '(c.code LIKE ? OR c.name LIKE ?)';
-            $bindings[] = "%{$search}%";
-            $bindings[] = "%{$search}%";
-        }
-
-        // status filter
-        if ($status !== null && $status !== 'all') {
-            $whereClause[] = 'c.status = ?';
-            $bindings[] = $status;
-        }
-
-        $query = '';
-
-        if (count($whereClause) > 0) {
-            $query = 'WHERE '.implode(' AND ', $whereClause);
-        }
-
-        // pagination
         $offset = ($currentPage - 1) * $perPage;
-        $dataBindings = array_merge($bindings, [$perPage, $offset]);
 
-        $courses = DB::select("
-            SELECT c.*, p.code as programme_code 
-            FROM course_master c 
-            JOIN programme_master p ON c.programme_id = p.programme_id 
-            $query 
-            ORDER BY c.created_at DESC 
-            LIMIT ? OFFSET ?", $dataBindings);
-
-        $totalRecords = DB::selectOne("
-            SELECT COUNT(*) as count 
-            FROM course_master c 
-            JOIN programme_master p ON c.programme_id = p.programme_id 
-            $query", $bindings)->count;
+        $courses = $this->courseRepo->getPaginatedCourses($search, $status, $perPage, $offset);
+        $totalRecords = $this->courseRepo->getTotalCoursesCount($search, $status);
 
         $paginator = new LengthAwarePaginator(
             $courses,
@@ -80,9 +52,7 @@ class CourseController extends Controller
         );
 
         $programmes = Cache::rememberForever('active_programmes', function () {
-            $results = DB::select("SELECT programme_id, name FROM programme_master WHERE status = 'active'");
-
-            return array_map(fn ($item) => (array) $item, $results);
+            return $this->courseRepo->getActiveProgrammes();
         });
 
         return Inertia::render('Admin/Courses/Index', [
@@ -104,15 +74,12 @@ class CourseController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        DB::insert('INSERT INTO course_master (programme_id, code, name, status, created_by, created_at, updated_at) VALUES (?,?,?,?,?,?,?)', [
-            $validated['programme_id'],
-            $validated['code'],
-            $validated['name'],
-            $validated['status'],
+        $this->courseRepo->createCourse(
+            $validated,
             Auth::id(),
             now(),
-            now(),
-        ]);
+            now()
+        );
 
         return back()->with('success', 'Course created successfully');
     }
@@ -120,7 +87,7 @@ class CourseController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $course_id)
+    public function update(Request $request, int $course_id)
     {
         $request->merge(['course_id' => $course_id]);
 
@@ -132,9 +99,11 @@ class CourseController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        DB::update('UPDATE course_master SET programme_id = ?, code = ?, name = ?, status = ?, updated_at = ? where course_id = ?', [
-            $validated['programme_id'], $validated['code'], $validated['name'], $validated['status'], now(), $course_id,
-        ]);
+        $this->courseRepo->updateCourse(
+            $course_id,
+            $validated,
+            now()
+        );
 
         return back()->with('success', 'Course updated successfully');
     }
@@ -142,7 +111,7 @@ class CourseController extends Controller
     /**
      * Update status of the specified resource from storage.
      */
-    public function updateStatus(Request $request, $course_id)
+    public function updateStatus(Request $request, int $course_id)
     {
         $request->merge(['course_id' => $course_id]);
 
@@ -151,11 +120,11 @@ class CourseController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        DB::update('UPDATE course_master SET status = ? , updated_at = ? WHERE course_id = ?', [
-            $validated['status'],
-            now(),
+        $this->courseRepo->updateCourseStatus(
             $course_id,
-        ]);
+            $validated['status'],
+            now()
+        );
 
         return back()->with('success', 'Course status changed successfully');
     }
@@ -168,13 +137,11 @@ class CourseController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        $placeHolders = implode(',', array_fill(0, count($request->course_ids), '?'));
-
-        DB::update("UPDATE course_master SET status = ?, updated_at = ? WHERE course_id IN ($placeHolders)", [
+        $this->courseRepo->bulkUpdateCourseStatus(
+            $validated['course_ids'],
             $validated['status'],
-            now(),
-            ...$validated['course_ids'],
-        ]);
+            now()
+        );
 
         return back()->with('success', 'Course status changed successfully');
     }

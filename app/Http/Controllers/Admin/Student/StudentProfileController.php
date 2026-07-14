@@ -5,21 +5,29 @@ namespace App\Http\Controllers\Admin\Student;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateStudentProfileRequest;
 use App\Http\Requests\UpdateStudentProfileRequest;
-use Exception;
 use App\Mail\StudentWelcomeEmail;
+use App\Repositories\Admin\StudentRepository;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class StudentProfileController extends Controller
 {
+    protected StudentRepository $studentRepo;
+
+    public function __construct(StudentRepository $studentRepo)
+    {
+        $this->studentRepo = $studentRepo;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -39,48 +47,8 @@ class StudentProfileController extends Controller
 
         $offset = ($currentPage - 1) * $perPage;
 
-        $whereClause = [];
-        $bindings = [];
-
-        if (! empty($search)) {
-            $whereClause[] = '(s.registration_number LIKE ? OR s.full_name LIKE ? OR s.email LIKE ? OR s.mobile_no LIKE ?)';
-            $searchTerm = "%{$search}%";
-            array_push($bindings, $searchTerm, $searchTerm, $searchTerm, $searchTerm);
-        }
-
-        if ($status !== null && $status !== 'all') {
-            $whereClause[] = 's.status = ?';
-            $bindings[] = $status;
-        }
-
-        $query = '';
-        if (count($whereClause) > 0) {
-            $query = 'WHERE '.implode(' AND ', $whereClause);
-        }
-
-        $dataBindings = array_merge($bindings, [$perPage, $offset]);
-
-        $students = DB::select("
-            SELECT s.id, s.registration_number, s.full_name, s.email, s.mobile_no, s.status,  
-                   c.name as course_name, 
-                   b.name as batch_name
-            FROM student_profiles as s 
-            LEFT JOIN student_paper_selections as sps on s.id = sps.student_profile_id
-            LEFT JOIN course_master as c on c.course_id = sps.course_id
-            LEFT JOIN batch_master as b on b.batch_id = sps.batch_id
-            $query
-            ORDER BY s.created_at DESC
-            LIMIT ? OFFSET ?
-        ", $dataBindings);
-
-        $totalRecords = DB::selectOne("
-            SELECT COUNT(*) as count 
-            FROM student_profiles as s 
-            LEFT JOIN student_paper_selections as sps on s.id = sps.student_profile_id
-            LEFT JOIN course_master as c on c.course_id = sps.course_id
-            LEFT JOIN batch_master as b on b.batch_id = sps.batch_id
-            $query
-        ", $bindings)->count;
+        $students = $this->studentRepo->getPaginatedStudents($search, $status, $perPage, $offset);
+        $totalRecords = $this->studentRepo->getTotalStudentsCount($search, $status);
 
         $paginator = new LengthAwarePaginator(
             $students,
@@ -101,9 +69,9 @@ class StudentProfileController extends Controller
      */
     public function create()
     {
-        $programmesWithCourses = Cache::rememberForever('active_programmes_with_courses', function () {
-            $programmes = DB::select("SELECT programme_id, name as programme_name FROM programme_master WHERE status = 'active'");
-            $courses = DB::select("SELECT course_id, programme_id, name as course_name FROM course_master WHERE status = 'active'");
+        $programmesWithCourses = Cache::remember('active_programmes_with_courses', 60 * 24, function () {
+            $programmes = $this->studentRepo->getActiveProgrammes();
+            $courses = $this->studentRepo->getActiveCourses();
 
             $groupedCourses = [];
             foreach ($courses as $course) {
@@ -125,8 +93,8 @@ class StudentProfileController extends Controller
             return $result;
         });
 
-        $batches = Cache::rememberForever('active_batches', function () {
-            return DB::select("SELECT batch_id, name as batch_name FROM batch_master WHERE status = 'active'");
+        $batches = Cache::remember('active_batches', 60 * 24, function () {
+            return $this->studentRepo->getActiveBatches();
         });
 
         return Inertia::render('Admin/Students/Create', [
@@ -144,14 +112,14 @@ class StudentProfileController extends Controller
 
         try {
             DB::transaction(function () use ($request, $validated) {
-                $createdAt = now();
-                $updatedAt = now();
+                $createdAt = now()->toDateTimeString();
+                $updatedAt = now()->toDateTimeString();
 
                 // 1. Generate Registration Number based on Batch Year (Sequential)
-                $batchName = DB::selectOne('SELECT name FROM batch_master WHERE batch_id = ?', [$validated['batch_id']]);
+                $batchName = $this->studentRepo->getBatchNameById($validated['batch_id']);
                 $batchStartYear = $batchName ? (explode('-', $batchName->name)[0] ?? date('Y')) : date('Y');
 
-                $lastProfile = DB::selectOne('SELECT registration_number FROM student_profiles WHERE registration_number LIKE ? ORDER BY registration_number DESC LIMIT 1', [$batchStartYear.'%']);
+                $lastProfile = $this->studentRepo->getLastRegistrationNumberByYear($batchStartYear);
 
                 if ($lastProfile) {
                     $lastNumber = (int) substr($lastProfile->registration_number, strlen($batchStartYear));
@@ -165,95 +133,32 @@ class StudentProfileController extends Controller
                 $temporaryPassword = Str::random(10);
 
                 // 2. Create User
-                DB::insert(
-                    'INSERT INTO users (name, login_identifier, role, password, is_password_changed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    [
-                        $validated['full_name'],
-                        $registrationNumber,
-                        'student',
-                        Hash::make($temporaryPassword),
-                        false,
-                        $createdAt,
-                        $updatedAt
-                    ]
+                $userId = $this->studentRepo->createUser(
+                    $validated['full_name'],
+                    $registrationNumber,
+                    'student',
+                    Hash::make($temporaryPassword),
+                    false,
+                    $createdAt,
+                    $updatedAt
                 );
-                
-                $userId = DB::getPdo()->lastInsertId();
 
                 // 3. Insert into student_profiles
-                DB::insert(
-                    'INSERT INTO student_profiles (user_id, registration_number, full_name, father_name, mother_name, gender, dob, abc_id, aadhaar_no, nationality, mobile_no, email, religion, caste, blood_group, marital_status, annual_family_income, parent_mobile_no, is_blind, is_bpl, is_minority, is_ph, present_address, present_city, present_country, present_state, present_district, present_pincode, permanent_address, permanent_city, permanent_country, permanent_state, permanent_district, permanent_pincode, admission_type, exam_name, board_name, institution_name, max_marks, marks_obtained, percentage, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                    [
-                        $userId,
-                        $registrationNumber,
-                        $validated['full_name'],
-                        $validated['father_name'],
-                        $validated['mother_name'],
-                        $validated['gender'],
-                        $validated['dob'],
-                        $validated['abc_id'] ?? null,
-                        $validated['aadhaar_no'] ?? null,
-                        $validated['nationality'],
-                        $validated['mobile_no'],
-                        $validated['email'],
-                        $validated['religion'],
-                        $validated['caste'],
-                        $validated['blood_group'],
-                        $validated['marital_status'],
-                        $validated['annual_family_income'] ?? null,
-                        $validated['parent_mobile_no'] ?? null,
-                        $validated['is_blind'] ?? false,
-                        $validated['is_bpl'] ?? false,
-                        $validated['is_minority'] ?? false,
-                        $validated['is_ph'] ?? false,
-                        $validated['present_address'],
-                        $validated['present_city'],
-                        $validated['present_country'],
-                        $validated['present_state'],
-                        $validated['present_district'],
-                        $validated['present_pincode'],
-                        $validated['permanent_address'],
-                        $validated['permanent_city'],
-                        $validated['permanent_country'],
-                        $validated['permanent_state'],
-                        $validated['permanent_district'],
-                        $validated['permanent_pincode'],
-                        $validated['admission_type'],
-                        $validated['exam_name'],
-                        $validated['board_name'],
-                        $validated['institution_name'],
-                        $validated['max_marks'],
-                        $validated['marks_obtained'],
-                        $validated['percentage'],
-                        $createdAt,
-                        $updatedAt,
-                    ]
-                );
+                $studentId = $this->studentRepo->createStudentProfile($userId, $registrationNumber, $validated, $createdAt, $updatedAt);
 
-                $studentId = DB::getPdo()->lastInsertId();
+                // 4. Insert into student_paper_selections
+                $this->studentRepo->createStudentPaperSelection($studentId, $validated['programme_id'], $validated['course_id'], $validated['batch_id'], $createdAt, $updatedAt);
 
-                // 3. Insert into student_paper_selections
-                DB::insert(
-                    'INSERT INTO student_paper_selections (student_profile_id, programme_id, course_id, batch_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
-                    [$studentId, $validated['programme_id'], $validated['course_id'], $validated['batch_id'], $createdAt, $updatedAt]
-                );
-
-                // 4. Store Documents and Insert into student_documents
+                // 5. Store Documents and Insert into student_documents
                 $photoPath = $request->file('photo')->store('documents', 'public');
                 $signaturePath = $request->file('signature')->store('documents', 'public');
 
-                DB::insert(
-                    'INSERT INTO student_documents (student_profile_id, photo_path, signature_path, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
-                    [$studentId, $photoPath, $signaturePath, $createdAt, $updatedAt]
-                );
+                $this->studentRepo->createStudentDocument($studentId, $photoPath, $signaturePath, $createdAt, $updatedAt);
 
-                // 5. Insert into student_payments
-                DB::insert(
-                    'INSERT INTO student_payments (student_profile_id, fee_type, amount, payment_method, transaction_id, payment_date, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                    [$studentId, $validated['fee_type'], $validated['amount'], $validated['payment_method'], $validated['transaction_id'], $validated['payment_date'], $createdAt, $updatedAt]
-                );
+                // 6. Insert into student_payments
+                $this->studentRepo->createStudentPayment($studentId, $validated, $createdAt, $updatedAt);
 
-                // 6. Dispatch Welcome Email
+                // 7. Dispatch Welcome Email
                 Mail::to($validated['email'])->send(
                     new StudentWelcomeEmail($validated['full_name'], $registrationNumber, $temporaryPassword)
                 );
@@ -270,29 +175,9 @@ class StudentProfileController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(int $id)
     {
-        $student = DB::selectOne('
-            SELECT sp.*, 
-                   pm.name AS programme_name,
-                   cm.name AS course_name,
-                   bm.name AS batch_name,
-                   sd.photo_path AS photo, 
-                   sd.signature_path AS signature,
-                   spay.fee_type, 
-                   spay.amount, 
-                   spay.payment_method, 
-                   spay.transaction_id, 
-                   spay.payment_date
-            FROM student_profiles sp
-            LEFT JOIN student_paper_selections sps ON sp.id = sps.student_profile_id
-            LEFT JOIN programme_master pm ON sps.programme_id = pm.programme_id
-            LEFT JOIN course_master cm ON sps.course_id = cm.course_id
-            LEFT JOIN batch_master bm ON sps.batch_id = bm.batch_id
-            LEFT JOIN student_documents sd ON sp.id = sd.student_profile_id
-            LEFT JOIN student_payments spay ON sp.id = spay.student_profile_id
-            WHERE sp.id = ?
-        ', [$id]);
+        $student = $this->studentRepo->getStudentWithRelationsById($id);
 
         if (! $student) {
             abort(404, 'Student not found');
@@ -308,43 +193,39 @@ class StudentProfileController extends Controller
      */
     public function edit($id)
     {
-        $studentProfile = DB::selectOne('
-            SELECT sp.*, 
-                   sps.programme_id, sps.course_id, sps.batch_id,
-                   sd.photo_path AS photo, sd.signature_path AS signature,
-                   spay.fee_type, spay.amount, spay.payment_method, spay.transaction_id, spay.payment_date
-            FROM student_profiles sp
-            LEFT JOIN student_paper_selections sps ON sp.id = sps.student_profile_id
-            LEFT JOIN student_documents sd ON sp.id = sd.student_profile_id
-            LEFT JOIN student_payments spay ON sp.id = spay.student_profile_id
-            WHERE sp.id = ?
-        ', [$id]);
+        $studentProfile = $this->studentRepo->getStudentWithRelationsById($id);
 
         if (! $studentProfile) {
             abort(404, 'Student not found');
         }
 
-        $programmes = DB::select("SELECT programme_id, name as programme_name FROM programme_master WHERE status = 'active'");
-        $courses = DB::select("SELECT course_id, programme_id, name as course_name FROM course_master WHERE status = 'active'");
+        $programmesWithCourses = Cache::remember('active_programmes_with_courses', 60 * 24, function () {
+            $programmes = $this->studentRepo->getActiveProgrammes();
+            $courses = $this->studentRepo->getActiveCourses();
 
-        $groupedCourses = [];
-        foreach ($courses as $course) {
-            $groupedCourses[$course->programme_id][] = [
-                'course_id' => $course->course_id,
-                'course_name' => $course->course_name,
-            ];
-        }
+            $groupedCourses = [];
+            foreach ($courses as $course) {
+                $groupedCourses[$course->programme_id][] = [
+                    'course_id' => $course->course_id,
+                    'course_name' => $course->course_name,
+                ];
+            }
 
-        $programmesWithCourses = [];
-        foreach ($programmes as $prog) {
-            $programmesWithCourses[] = [
-                'programme_id' => $prog->programme_id,
-                'programme_name' => $prog->programme_name,
-                'courses' => $groupedCourses[$prog->programme_id] ?? [],
-            ];
-        }
+            $result = [];
+            foreach ($programmes as $prog) {
+                $result[] = [
+                    'programme_id' => $prog->programme_id,
+                    'programme_name' => $prog->programme_name,
+                    'courses' => $groupedCourses[$prog->programme_id] ?? [],
+                ];
+            }
 
-        $batches = DB::select("SELECT batch_id, name as batch_name FROM batch_master WHERE status = 'active'");
+            return $result;
+        });
+
+        $batches = Cache::remember('active_batches', 60 * 24, function () {
+            return $this->studentRepo->getActiveBatches();
+        });
 
         return Inertia::render('Admin/Students/Edit', [
             'programmes_with_courses' => $programmesWithCourses,
@@ -359,56 +240,10 @@ class StudentProfileController extends Controller
     public function update(UpdateStudentProfileRequest $request, $id)
     {
         $validated = $request->validated();
-        $validated['updated_at'] = now();
 
-        DB::update(
-            'UPDATE student_profiles SET full_name = ?, father_name = ?, mother_name = ?, gender = ?, dob = ?, abc_id = ?, aadhaar_no = ?, nationality = ?, mobile_no = ?, email = ?, religion = ?, caste = ?, blood_group = ?, marital_status = ?, annual_family_income = ?, parent_mobile_no = ?, is_blind = ?, is_bpl = ?, is_minority = ?, is_ph = ?, present_address = ?, present_city = ?, present_country = ?, present_state = ?, present_district = ?, present_pincode = ?, permanent_address = ?, permanent_city = ?, permanent_country = ?, permanent_state = ?, permanent_district = ?, permanent_pincode = ?, admission_type = ?, exam_name = ?, board_name = ?, institution_name = ?, max_marks = ?, marks_obtained = ?, percentage = ?, updated_at = ? WHERE id = ?',
-            [
-                $validated['full_name'],
-                $validated['father_name'],
-                $validated['mother_name'],
-                $validated['gender'],
-                $validated['dob'],
-                $validated['abc_id'] ?? null,
-                $validated['aadhaar_no'] ?? null,
-                $validated['nationality'],
-                $validated['mobile_no'],
-                $validated['email'],
-                $validated['religion'],
-                $validated['caste'],
-                $validated['blood_group'],
-                $validated['marital_status'],
-                $validated['annual_family_income'] ?? null,
-                $validated['parent_mobile_no'] ?? null,
-                $validated['is_blind'] ?? false,
-                $validated['is_bpl'] ?? false,
-                $validated['is_minority'] ?? false,
-                $validated['is_ph'] ?? false,
-                $validated['present_address'],
-                $validated['present_city'],
-                $validated['present_country'],
-                $validated['present_state'],
-                $validated['present_district'],
-                $validated['present_pincode'],
-                $validated['permanent_address'],
-                $validated['permanent_city'],
-                $validated['permanent_country'],
-                $validated['permanent_state'],
-                $validated['permanent_district'],
-                $validated['permanent_pincode'],
-                $validated['admission_type'],
-                $validated['exam_name'],
-                $validated['board_name'],
-                $validated['institution_name'],
-                $validated['max_marks'],
-                $validated['marks_obtained'],
-                $validated['percentage'],
-                $validated['updated_at'],
-                $id,
-            ]
-        );
+        $this->studentRepo->updateStudentProfile($id, $validated, now());
 
-        $studentProfile = DB::selectOne('SELECT * FROM student_profiles WHERE id = ?', [$id]);
+        $studentProfile = $this->studentRepo->getStudentProfileById($id);
 
         return redirect()->back()->with([
             'success' => 'Basic information updated successfully.',
@@ -417,7 +252,7 @@ class StudentProfileController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, int $id)
     {
         $request->merge(['id' => $id]);
 
@@ -426,10 +261,7 @@ class StudentProfileController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        DB::update(
-            'UPDATE student_profiles SET status = ?, updated_at = ? WHERE id = ?',
-            [$request->status, now(), $id]
-        );
+        $this->studentRepo->updateStudentStatus($id, $request->status, now());
 
         return back()->with('success', 'Student status changed successfully.');
     }
@@ -446,13 +278,7 @@ class StudentProfileController extends Controller
             return back()->with('error', 'No students selected.');
         }
 
-        $placeholders = implode(',', array_fill(0, count($request->student_ids), '?'));
-        $bindings = array_merge([$request->status, now()], $request->student_ids);
-
-        DB::update(
-            "UPDATE student_profiles SET status = ?, updated_at = ? WHERE id IN ($placeholders)",
-            $bindings
-        );
+        $this->studentRepo->bulkUpdateStudentStatus($request->student_ids, $request->status, now());
 
         return back()->with('success', 'Selected students status changed successfully.');
     }

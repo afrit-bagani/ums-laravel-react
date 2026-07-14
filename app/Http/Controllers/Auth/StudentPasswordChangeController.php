@@ -3,15 +3,22 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 
 class StudentPasswordChangeController extends Controller
 {
+    protected $userRepo;
+
+    public function __construct(UserRepository $userRepo)
+    {
+        $this->userRepo = $userRepo;
+    }
+
     public function create()
     {
         return Inertia::render('Student/ChangePassword');
@@ -26,9 +33,10 @@ class StudentPasswordChangeController extends Controller
 
         $user = Auth::user();
 
-        DB::update(
-            'UPDATE users SET password = ?, is_password_changed = ?, updated_at = ? WHERE id = ?',
-            [Hash::make($validated['password']), true, now(), $user->id]
+        $this->userRepo->updatePassword(
+            $user->id,
+            Hash::make($validated['password']),
+            true
         );
 
         return redirect()->route('student.dashboard')->with('success', 'Password changed successfully. Welcome to your dashboard!');

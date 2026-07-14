@@ -3,11 +3,18 @@
 namespace App\Http\Controllers\Admin\Student;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\Admin\StudentRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class StudentDocumentController extends Controller
 {
+    protected StudentRepository $studentRepo;
+
+    public function __construct(StudentRepository $studentRepo)
+    {
+        $this->studentRepo = $studentRepo;
+    }
+
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -36,12 +43,7 @@ class StudentDocumentController extends Controller
 
             $bindings[] = $id;
 
-            $setClause = implode(', ', $updates);
-
-            DB::update(
-                "UPDATE student_documents SET {$setClause} WHERE student_profile_id = ?",
-                $bindings
-            );
+            $this->studentRepo->updateStudentDocuments($id, $updates, $bindings);
         }
 
         return redirect()->back()->with('success', 'Documents updated successfully.');

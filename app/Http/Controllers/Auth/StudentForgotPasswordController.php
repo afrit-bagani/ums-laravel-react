@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Mail\ForgotPasswordEmail;
+use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -13,6 +13,13 @@ use Inertia\Inertia;
 
 class StudentForgotPasswordController extends Controller
 {
+    protected $userRepo;
+
+    public function __construct(UserRepository $userRepo)
+    {
+        $this->userRepo = $userRepo;
+    }
+
     public function create()
     {
         return Inertia::render('Student/ForgotPassword');
@@ -24,18 +31,13 @@ class StudentForgotPasswordController extends Controller
             'login_identifier' => ['required', 'string'],
         ]);
 
-        $user = DB::table('users')
-            ->where('role', 'student')
-            ->where('login_identifier', $request->login_identifier)
-            ->first();
+        $user = $this->userRepo->findByRoleAndIdentifier('student', $request->login_identifier);
 
         if (! $user) {
             return back()->withErrors(['error' => 'No student found with this registration number.']);
         }
 
-        $studentProfile = DB::table('student_profiles')
-            ->where('user_id', $user->id)
-            ->first();
+        $studentProfile = $this->userRepo->findStudentProfileByUserId($user->id);
 
         if (! $studentProfile || empty($studentProfile->email)) {
             return back()->withErrors(['error' => 'No email address is associated with this student account.']);
@@ -43,11 +45,11 @@ class StudentForgotPasswordController extends Controller
 
         $temporaryPassword = Str::random(10);
 
-        DB::table('users')->where('id', $user->id)->update([
-            'password' => Hash::make($temporaryPassword),
-            'is_password_changed' => false,
-            'updated_at' => now(),
-        ]);
+        $this->userRepo->updatePassword(
+            $user->id,
+            Hash::make($temporaryPassword),
+            false
+        );
 
         Mail::to($studentProfile->email)->send(
             new ForgotPasswordEmail(

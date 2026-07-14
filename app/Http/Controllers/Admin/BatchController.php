@@ -3,21 +3,27 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\Admin\BatchRepository;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class BatchController extends Controller
 {
+    protected BatchRepository $batchRepo;
+
+    public function __construct(BatchRepository $batchRepo)
+    {
+        $this->batchRepo = $batchRepo;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-
         $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable', Rule::in(['active', 'inactive', 'all'])],
@@ -32,38 +38,8 @@ class BatchController extends Controller
 
         $offset = ($currentPage - 1) * $perPage;
 
-        $whereClauses = [];
-        $bindings = [];
-
-        // search filter
-        if (! empty($search)) {
-            $whereClauses[] = '(code LIKE ? OR name LIKE ?)';
-            $bindings[] = "%{$search}%";
-            $bindings[] = "%{$search}%";
-        }
-
-        // status filter
-        if ($status !== null && $status !== 'all') {
-            $whereClauses[] = 'status = ?';
-            $bindings[] = $status;
-        }
-
-        $query = '';
-        if (count($whereClauses) > 0) {
-            $query = 'WHERE '.implode(' AND ', $whereClauses); // final query string
-        }
-
-        $dataBindings = array_merge($bindings, [$perPage, $offset]);
-
-        $batches = DB::select(
-            "SELECT * from batch_master $query ORDER BY batch_id DESC LIMIT ? OFFSET ? ",
-            $dataBindings
-        );
-
-        $totalRecords = DB::selectOne(
-            "SELECT COUNT(*) as count FROM batch_master $query",
-            $bindings
-        )->count;
+        $batches = $this->batchRepo->getPaginatedBatches($search, $status, $perPage, $offset);
+        $totalRecords = $this->batchRepo->getTotalBatchesCount($search, $status);
 
         $paginator = new LengthAwarePaginator(
             $batches,
@@ -90,9 +66,11 @@ class BatchController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        DB::insert(
-            'INSERT INTO batch_master (code, name, status, created_by, created_at, updated_at) VALUES(?,?,?,?,?,?)',
-            [$request->code, $request->name, $request->status, Auth::id(), now(), now()]
+        $this->batchRepo->createBatch(
+            $request->only(['code', 'name', 'status']),
+            Auth::id(),
+            now(),
+            now()
         );
 
         return back()->with('success', 'Batch created successfully.');
@@ -101,7 +79,7 @@ class BatchController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $batch_id)
+    public function update(Request $request, int $batch_id)
     {
         $request->merge(['batch_id' => $batch_id]);
 
@@ -111,9 +89,10 @@ class BatchController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        DB::update(
-            'UPDATE batch_master SET code = ?, name = ?, status = ?, updated_at = ? WHERE batch_id =?',
-            [$request->code, $request->name, $request->status, now(), $batch_id],
+        $this->batchRepo->updateBatch(
+            $batch_id,
+            $request->only(['code', 'name', 'status']),
+            now()
         );
 
         return back()->with('success', 'Batch updated successfully.');
@@ -122,7 +101,7 @@ class BatchController extends Controller
     /**
      * Update status of the specified resource in storage.
      */
-    public function updateStatus(Request $request, $batch_id)
+    public function updateStatus(Request $request, int $batch_id)
     {
         $request->merge(['batch_id' => $batch_id]);
 
@@ -131,8 +110,10 @@ class BatchController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        DB::update('UPDATE batch_master set status = ?, updated_at = ? WHERE batch_id = ?',
-            [$request->status, now(), $batch_id]
+        $this->batchRepo->updateBatchStatus(
+            $batch_id,
+            $request->status,
+            now()
         );
 
         return back()->with('success', 'Batch status changed successfully.');
@@ -146,10 +127,11 @@ class BatchController extends Controller
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
 
-        $placeholders = implode(',', array_fill(0, count($request->batch_ids), '?'));
-        $bindings = [$request->status, now(), ...$request->batch_ids];
-
-        DB::update("UPDATE batch_master SET status = ?, updated_at = ? WHERE batch_id IN ($placeholders)", $bindings);
+        $this->batchRepo->bulkUpdateBatchStatus(
+            $request->batch_ids,
+            $request->status,
+            now()
+        );
 
         return back()->with('success', 'Batch status changed successfully.');
     }
