@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,7 @@ import FlashMessageListner from '@/components/FlashMessageListner';
 
 export default function ChangePassword() {
   const route = useRoute();
+  const isPasswordChanged = usePage().props.auth.user.is_password_changed;
 
   const { data, setData, post, processing, errors } = useForm({
     current_password: '',
@@ -20,7 +21,10 @@ export default function ChangePassword() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    post(route('student.password.update'));
+    post(route('student.password.update'), {
+      preserveState: true,
+      preserveScroll: true,
+    });
   };
 
   return (
@@ -37,7 +41,7 @@ export default function ChangePassword() {
             <CardTitle className="text-2xl font-bold text-center text-indigo-950">Change Your Password</CardTitle>
             <CardDescription className="text-center text-gray-500 flex items-center justify-center gap-1.5 mt-2">
               <ShieldAlert className="w-4 h-4 text-amber-500" />
-              You must change your default password before accessing the dashboard.
+              {isPasswordChanged ? 'Change Your password' : 'You must change your default password before accessing the dashboard.'}
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
