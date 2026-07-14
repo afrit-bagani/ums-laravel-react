@@ -21,6 +21,10 @@ use Inertia\Inertia;
 Route::middleware('guest')->group(function () {
     Route::get('/', fn () => Inertia::render('Welcome'))->name('welcome');
 
+    // Applicant routes
+    Route::get('/applicant/apply', [\App\Http\Controllers\Applicant\ApplicantController::class, 'create'])->name('applicant.apply');
+    Route::post('/applicant/apply', [\App\Http\Controllers\Applicant\ApplicantController::class, 'store'])->name('applicant.apply.store');
+
     Route::get('student/login', [StudentLoginController::class, 'create'])->name('student.login');
     Route::post('student/login', [StudentLoginController::class, 'store'])->name('student.login.store');
     

@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('applicant_documents', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('applicant_profile_id')->constrained('applicant_profiles')->cascadeOnDelete();
+            $table->string('photo_path');
+            $table->string('signature_path');
             $table->timestamps();
         });
     }
