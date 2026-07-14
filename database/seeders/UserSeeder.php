@@ -13,8 +13,8 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
-            'name' => 'Admin 1',
-            'login_identifier' => 'admin1@gmail.com',
+            'name' => 'Afrit Bagani',
+            'login_identifier' => 'afrit.bagani22@tnu.in',
             'role' => 'admin',
             'is_password_changed' => true,
         ]);
