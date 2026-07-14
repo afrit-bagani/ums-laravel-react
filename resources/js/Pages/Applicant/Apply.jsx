@@ -79,10 +79,10 @@ export default function Apply({ programmes_with_courses, batches }) {
         if (hasErrors) {
             toast.error("Please fix the errors in the form before submitting.");
             // Determine which tab has errors and switch to it
-            const profileErrors = ['full_name', 'father_name', 'mother_name', 'gender', 'dob', 'mobile_no', 'email', 'religion', 'caste', 'blood_group', 'marital_status', 'present_address', 'present_city', 'present_state', 'present_pincode', 'permanent_address', 'permanent_city', 'permanent_state', 'permanent_pincode'];
+            const profileErrors = ['full_name', 'father_name', 'mother_name', 'gender', 'dob', 'mobile_no', 'email', 'aadhaar_no', 'abc_id', 'religion', 'caste', 'blood_group', 'marital_status', 'annual_family_income', 'parent_mobile_no', 'is_blind', 'is_bpl', 'is_minority', 'is_ph', 'present_address', 'present_city', 'present_district', 'present_state', 'present_pincode', 'permanent_address', 'permanent_city', 'permanent_district', 'permanent_state', 'permanent_pincode'];
             const academicErrors = ['admission_type', 'exam_name', 'board_name', 'institution_name', 'max_marks', 'marks_obtained', 'percentage', 'programme_id', 'course_id', 'batch_id'];
             const documentErrors = ['photo', 'signature'];
-            const paymentErrors = ['fee_type', 'amount', 'payment_method'];
+            const paymentErrors = ['fee_type', 'amount', 'payment_method', 'transaction_id', 'payment_date'];
 
             const errorKeys = Object.keys(errors);
             if (errorKeys.some(k => profileErrors.includes(k))) setActiveTab('profile');
@@ -97,16 +97,27 @@ export default function Apply({ programmes_with_courses, batches }) {
         post(route('applicant.apply.store'));
     };
 
-    const copyAddress = () => {
-        setData(data => ({
-            ...data,
-            permanent_address: data.present_address,
-            permanent_city: data.present_city,
-            permanent_country: data.present_country,
-            permanent_state: data.present_state,
-            permanent_district: data.present_district,
-            permanent_pincode: data.present_pincode,
-        }));
+    const handleSameAddressChange = (checked) => {
+        if (checked) {
+            setData(data => ({
+                ...data,
+                permanent_address: data.present_address,
+                permanent_city: data.present_city,
+                permanent_country: data.present_country,
+                permanent_state: data.present_state,
+                permanent_district: data.present_district,
+                permanent_pincode: data.present_pincode,
+            }));
+        } else {
+            setData(data => ({
+                ...data,
+                permanent_address: '',
+                permanent_city: '',
+                permanent_state: '',
+                permanent_district: '',
+                permanent_pincode: '',
+            }));
+        }
     };
 
     return (
@@ -118,6 +129,17 @@ export default function Apply({ programmes_with_courses, batches }) {
                     <h1 className="text-3xl font-extrabold text-neutral-900 tracking-tight">University Application Portal</h1>
                     <p className="mt-2 text-neutral-600">Complete your application process in four simple steps.</p>
                 </div>
+
+                {hasErrors && (
+                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <h4 className="text-red-700 font-semibold mb-2">Please fix the following errors:</h4>
+                        <ul className="list-disc list-inside text-sm text-red-600 space-y-1">
+                            {Object.entries(errors).map(([field, message]) => (
+                                <li key={field}>{message}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit}>
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -139,23 +161,23 @@ export default function Apply({ programmes_with_courses, batches }) {
                                     {/* Personal Details */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         <div className="space-y-2">
-                                            <Label htmlFor="full_name">Full Name *</Label>
+                                            <Label htmlFor="full_name">Full Name <span className='text-red-500'>*</span></Label>
                                             <Input id="full_name" value={data.full_name} onChange={e => setData('full_name', e.target.value)} />
                                             {errors.full_name && <ErrorAlert title={errors.full_name} />}
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="father_name">Father's Name *</Label>
+                                            <Label htmlFor="father_name">Father's Name <span className='text-red-500'>*</span></Label>
                                             <Input id="father_name" value={data.father_name} onChange={e => setData('father_name', e.target.value)} />
                                             {errors.father_name && <ErrorAlert title={errors.father_name} />}
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="mother_name">Mother's Name *</Label>
+                                            <Label htmlFor="mother_name">Mother's Name <span className='text-red-500'>*</span></Label>
                                             <Input id="mother_name" value={data.mother_name} onChange={e => setData('mother_name', e.target.value)} />
                                             {errors.mother_name && <ErrorAlert title={errors.mother_name} />}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label>Gender *</Label>
+                                            <Label>Gender <span className='text-red-500'>*</span></Label>
                                             <Select value={data.gender} onValueChange={v => setData('gender', v)}>
                                                 <SelectTrigger><SelectValue placeholder="Select Gender" /></SelectTrigger>
                                                 <SelectContent>
@@ -167,18 +189,18 @@ export default function Apply({ programmes_with_courses, batches }) {
                                             {errors.gender && <ErrorAlert title={errors.gender} />}
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="dob">Date of Birth *</Label>
+                                            <Label htmlFor="dob">Date of Birth <span className='text-red-500'>*</span></Label>
                                             <Input id="dob" type="date" value={data.dob} onChange={e => setData('dob', e.target.value)} />
                                             {errors.dob && <ErrorAlert title={errors.dob} />}
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="mobile_no">Mobile No *</Label>
+                                            <Label htmlFor="mobile_no">Mobile No <span className='text-red-500'>*</span></Label>
                                             <Input id="mobile_no" maxLength="10" value={data.mobile_no} onChange={e => setData('mobile_no', e.target.value)} />
                                             {errors.mobile_no && <ErrorAlert title={errors.mobile_no} />}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="email">Email Address *</Label>
+                                            <Label htmlFor="email">Email Address <span className='text-red-500'>*</span></Label>
                                             <Input id="email" type="email" value={data.email} onChange={e => setData('email', e.target.value)} />
                                             {errors.email && <ErrorAlert title={errors.email} />}
                                         </div>
@@ -194,7 +216,7 @@ export default function Apply({ programmes_with_courses, batches }) {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label>Religion *</Label>
+                                            <Label>Religion <span className='text-red-500'>*</span></Label>
                                             <Select value={data.religion} onValueChange={v => setData('religion', v)}>
                                                 <SelectTrigger><SelectValue placeholder="Select Religion" /></SelectTrigger>
                                                 <SelectContent>
@@ -204,7 +226,7 @@ export default function Apply({ programmes_with_courses, batches }) {
                                             {errors.religion && <ErrorAlert title={errors.religion} />}
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Caste Category *</Label>
+                                            <Label>Caste Category <span className='text-red-500'>*</span></Label>
                                             <Select value={data.caste} onValueChange={v => setData('caste', v)}>
                                                 <SelectTrigger><SelectValue placeholder="Select Caste" /></SelectTrigger>
                                                 <SelectContent>
@@ -214,7 +236,7 @@ export default function Apply({ programmes_with_courses, batches }) {
                                             {errors.caste && <ErrorAlert title={errors.caste} />}
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Blood Group *</Label>
+                                            <Label>Blood Group <span className='text-red-500'>*</span></Label>
                                             <Select value={data.blood_group} onValueChange={v => setData('blood_group', v)}>
                                                 <SelectTrigger><SelectValue placeholder="Select Blood Group" /></SelectTrigger>
                                                 <SelectContent>
@@ -225,7 +247,7 @@ export default function Apply({ programmes_with_courses, batches }) {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label>Marital Status *</Label>
+                                            <Label>Marital Status <span className='text-red-500'>*</span></Label>
                                             <Select value={data.marital_status} onValueChange={v => setData('marital_status', v)}>
                                                 <SelectTrigger><SelectValue placeholder="Select Status" /></SelectTrigger>
                                                 <SelectContent>
@@ -257,28 +279,28 @@ export default function Apply({ programmes_with_courses, batches }) {
                                         <div className="space-y-4">
                                             <h3 className="text-lg font-semibold text-neutral-800">Present Address</h3>
                                             <div className="space-y-2">
-                                                <Label>Address Line *</Label>
+                                                <Label>Address Line <span className='text-red-500'>*</span></Label>
                                                 <Input value={data.present_address} onChange={e => setData('present_address', e.target.value)} />
                                                 {errors.present_address && <ErrorAlert title={errors.present_address} />}
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-2">
-                                                    <Label>City *</Label>
+                                                    <Label>City <span className='text-red-500'>*</span></Label>
                                                     <Input value={data.present_city} onChange={e => setData('present_city', e.target.value)} />
                                                     {errors.present_city && <ErrorAlert title={errors.present_city} />}
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label>District *</Label>
+                                                    <Label>District <span className='text-red-500'>*</span></Label>
                                                     <Input value={data.present_district} onChange={e => setData('present_district', e.target.value)} />
                                                     {errors.present_district && <ErrorAlert title={errors.present_district} />}
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label>State *</Label>
+                                                    <Label>State <span className='text-red-500'>*</span></Label>
                                                     <Input value={data.present_state} onChange={e => setData('present_state', e.target.value)} />
                                                     {errors.present_state && <ErrorAlert title={errors.present_state} />}
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label>Pincode *</Label>
+                                                    <Label>Pincode <span className='text-red-500'>*</span></Label>
                                                     <Input maxLength="6" value={data.present_pincode} onChange={e => setData('present_pincode', e.target.value)} />
                                                     {errors.present_pincode && <ErrorAlert title={errors.present_pincode} />}
                                                 </div>
@@ -287,31 +309,34 @@ export default function Apply({ programmes_with_courses, batches }) {
                                         <div className="space-y-4">
                                             <div className="flex justify-between items-center">
                                                 <h3 className="text-lg font-semibold text-neutral-800">Permanent Address</h3>
-                                                <Button type="button" variant="outline" size="sm" onClick={copyAddress}>Same as Present</Button>
+                                                <div className="flex items-center space-x-2">
+                                                    <Checkbox id='same_address' onCheckedChange={(checked) => handleSameAddressChange(checked)} />
+                                                    <Label htmlFor='same_address' className="cursor-pointer">Same as Present</Label>
+                                                </div>
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Address Line *</Label>
+                                                <Label>Address Line <span className='text-red-500'>*</span></Label>
                                                 <Input value={data.permanent_address} onChange={e => setData('permanent_address', e.target.value)} />
                                                 {errors.permanent_address && <ErrorAlert title={errors.permanent_address} />}
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-2">
-                                                    <Label>City *</Label>
+                                                    <Label>City <span className='text-red-500'>*</span></Label>
                                                     <Input value={data.permanent_city} onChange={e => setData('permanent_city', e.target.value)} />
                                                     {errors.permanent_city && <ErrorAlert title={errors.permanent_city} />}
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label>District *</Label>
+                                                    <Label>District <span className='text-red-500'>*</span></Label>
                                                     <Input value={data.permanent_district} onChange={e => setData('permanent_district', e.target.value)} />
                                                     {errors.permanent_district && <ErrorAlert title={errors.permanent_district} />}
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label>State *</Label>
+                                                    <Label>State <span className='text-red-500'>*</span></Label>
                                                     <Input value={data.permanent_state} onChange={e => setData('permanent_state', e.target.value)} />
                                                     {errors.permanent_state && <ErrorAlert title={errors.permanent_state} />}
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label>Pincode *</Label>
+                                                    <Label>Pincode <span className='text-red-500'>*</span></Label>
                                                     <Input maxLength="6" value={data.permanent_pincode} onChange={e => setData('permanent_pincode', e.target.value)} />
                                                     {errors.permanent_pincode && <ErrorAlert title={errors.permanent_pincode} />}
                                                 </div>
@@ -337,7 +362,7 @@ export default function Apply({ programmes_with_courses, batches }) {
                                         <h3 className="text-lg font-semibold text-neutral-800 border-b pb-2">Past Qualification</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                             <div className="space-y-2">
-                                                <Label>Admission Type *</Label>
+                                                <Label>Admission Type <span className='text-red-500'>*</span></Label>
                                                 <Select value={data.admission_type} onValueChange={v => setData('admission_type', v)}>
                                                     <SelectTrigger><SelectValue placeholder="Select Type" /></SelectTrigger>
                                                     <SelectContent>
@@ -349,32 +374,32 @@ export default function Apply({ programmes_with_courses, batches }) {
                                                 {errors.admission_type && <ErrorAlert title={errors.admission_type} />}
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Exam Name *</Label>
+                                                <Label>Exam Name <span className='text-red-500'>*</span></Label>
                                                 <Input value={data.exam_name} onChange={e => setData('exam_name', e.target.value)} placeholder="e.g. 12th Board, B.Sc" />
                                                 {errors.exam_name && <ErrorAlert title={errors.exam_name} />}
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Board / University *</Label>
+                                                <Label>Board / University <span className='text-red-500'>*</span></Label>
                                                 <Input value={data.board_name} onChange={e => setData('board_name', e.target.value)} />
                                                 {errors.board_name && <ErrorAlert title={errors.board_name} />}
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Institution Name *</Label>
+                                                <Label>Institution Name <span className='text-red-500'>*</span></Label>
                                                 <Input value={data.institution_name} onChange={e => setData('institution_name', e.target.value)} />
                                                 {errors.institution_name && <ErrorAlert title={errors.institution_name} />}
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Max Marks *</Label>
+                                                <Label>Max Marks <span className='text-red-500'>*</span></Label>
                                                 <Input type="number" value={data.max_marks} onChange={e => setData('max_marks', e.target.value)} />
                                                 {errors.max_marks && <ErrorAlert title={errors.max_marks} />}
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Marks Obtained *</Label>
+                                                <Label>Marks Obtained <span className='text-red-500'>*</span></Label>
                                                 <Input type="number" value={data.marks_obtained} onChange={e => setData('marks_obtained', e.target.value)} />
                                                 {errors.marks_obtained && <ErrorAlert title={errors.marks_obtained} />}
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Percentage *</Label>
+                                                <Label>Percentage <span className='text-red-500'>*</span></Label>
                                                 <Input type="number" step="0.01" value={data.percentage} readOnly className="bg-neutral-50" />
                                                 {errors.percentage && <ErrorAlert title={errors.percentage} />}
                                             </div>
@@ -385,7 +410,7 @@ export default function Apply({ programmes_with_courses, batches }) {
                                         <h3 className="text-lg font-semibold text-neutral-800 border-b pb-2">Program Selection</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                             <div className="space-y-2">
-                                                <Label>Programme *</Label>
+                                                <Label>Programme <span className='text-red-500'>*</span></Label>
                                                 <Select value={data.programme_id.toString()} onValueChange={v => setData('programme_id', v)}>
                                                     <SelectTrigger><SelectValue placeholder="Select Programme" /></SelectTrigger>
                                                     <SelectContent>
@@ -397,7 +422,7 @@ export default function Apply({ programmes_with_courses, batches }) {
                                                 {errors.programme_id && <ErrorAlert title={errors.programme_id} />}
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Course *</Label>
+                                                <Label>Course <span className='text-red-500'>*</span></Label>
                                                 <Select value={data.course_id.toString()} onValueChange={v => setData('course_id', v)} disabled={!data.programme_id}>
                                                     <SelectTrigger><SelectValue placeholder="Select Course" /></SelectTrigger>
                                                     <SelectContent>
@@ -409,7 +434,7 @@ export default function Apply({ programmes_with_courses, batches }) {
                                                 {errors.course_id && <ErrorAlert title={errors.course_id} />}
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Batch / Year *</Label>
+                                                <Label>Batch / Year <span className='text-red-500'>*</span></Label>
                                                 <Select value={data.batch_id.toString()} onValueChange={v => setData('batch_id', v)}>
                                                     <SelectTrigger><SelectValue placeholder="Select Batch" /></SelectTrigger>
                                                     <SelectContent>
@@ -439,7 +464,7 @@ export default function Apply({ programmes_with_courses, batches }) {
                                 </CardHeader>
                                 <CardContent className="space-y-8 p-6 bg-white flex flex-col md:flex-row gap-8">
                                     <div className="flex-1 space-y-4">
-                                        <Label className="text-base font-semibold">Passport Photograph *</Label>
+                                        <Label className="text-base font-semibold">Passport Photograph <span className='text-red-500'>*</span></Label>
                                         <div className="border-2 border-dashed border-neutral-300 rounded-lg p-8 text-center bg-neutral-50 hover:bg-neutral-100 transition relative">
                                             <Input type="file" accept="image/jpeg, image/png" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={e => setData('photo', e.target.files[0])} />
                                             <div className="flex flex-col items-center pointer-events-none">
@@ -452,7 +477,7 @@ export default function Apply({ programmes_with_courses, batches }) {
                                         {errors.photo && <ErrorAlert title={errors.photo} />}
                                     </div>
                                     <div className="flex-1 space-y-4">
-                                        <Label className="text-base font-semibold">Digital Signature *</Label>
+                                        <Label className="text-base font-semibold">Digital Signature <span className='text-red-500'>*</span></Label>
                                         <div className="border-2 border-dashed border-neutral-300 rounded-lg p-8 text-center bg-neutral-50 hover:bg-neutral-100 transition relative">
                                             <Input type="file" accept="image/jpeg, image/png" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={e => setData('signature', e.target.files[0])} />
                                             <div className="flex flex-col items-center pointer-events-none">
@@ -482,16 +507,16 @@ export default function Apply({ programmes_with_courses, batches }) {
                                 <CardContent className="space-y-6 p-6 bg-white">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <Label>Fee Type *</Label>
+                                            <Label>Fee Type <span className='text-red-500'>*</span></Label>
                                             <Input value={data.fee_type} readOnly className="bg-neutral-50" />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Amount *</Label>
+                                            <Label>Amount <span className='text-red-500'>*</span></Label>
                                             <Input type="number" step="0.01" value={data.amount} onChange={e => setData('amount', e.target.value)} />
                                             {errors.amount && <ErrorAlert title={errors.amount} />}
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Payment Method *</Label>
+                                            <Label>Payment Method <span className='text-red-500'>*</span></Label>
                                             <Select value={data.payment_method} onValueChange={v => setData('payment_method', v)}>
                                                 <SelectTrigger><SelectValue placeholder="Select Method" /></SelectTrigger>
                                                 <SelectContent>
