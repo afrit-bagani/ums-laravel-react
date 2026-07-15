@@ -35,7 +35,7 @@ class StudentRepository
         return DB::select("
             SELECT s.id, s.registration_number, s.full_name, s.email, s.mobile_no, s.status,  
                    c.name as course_name, 
-                   b.name as batch_name
+                   CONCAT(b.code, ' - ', b.name) as batch_name
             FROM student_profiles as s 
             LEFT JOIN student_paper_selections as sps on s.id = sps.student_profile_id
             LEFT JOIN course_master as c on c.course_id = sps.course_id
@@ -101,7 +101,7 @@ class StudentRepository
      */
     public function getActiveBatches()
     {
-        return DB::select("SELECT batch_id, name as batch_name FROM batch_master WHERE status = 'active'");
+        return DB::select("SELECT batch_id, CONCAT(code, ' - ', name) as batch_name FROM batch_master WHERE status = 'active'");
     }
 
     /**
