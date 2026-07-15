@@ -39,12 +39,14 @@ export default function Login() {
                         </div>
                     </div>
                 </div>
-                <div className="relative hidden bg-muted lg:block">
-                    <img
-                        src="/student-login.svg"
-                        alt="Student Login Image"
-                        className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-                    />
+                <div className="hidden bg-muted lg:flex lg:items-center lg:justify-center p-12">
+                    <div className="w-full max-w-lg flex justify-center items-center">
+                        <img
+                            src="/student-login.svg"
+                            alt="Image"
+                            className="w-full h-auto object-contain dark:brightness-[0.2] dark:grayscale"
+                        />
+                    </div>
                 </div>
             </div>
         </>
