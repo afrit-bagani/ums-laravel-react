@@ -8,12 +8,13 @@ use App\Http\Controllers\Admin\Student\StudentPaperSelectionController;
 use App\Http\Controllers\Admin\Student\StudentPaymentController;
 use App\Http\Controllers\Admin\Student\StudentProfileController;
 use App\Http\Controllers\Admin\SubjectController;
+use App\Http\Controllers\Applicant\ApplicantController;
+use App\Http\Controllers\Auth\AdminForgotPasswordController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\AdminPasswordChangeController;
-use App\Http\Controllers\Auth\AdminForgotPasswordController;
+use App\Http\Controllers\Auth\StudentForgotPasswordController;
 use App\Http\Controllers\Auth\StudentLoginController;
 use App\Http\Controllers\Auth\StudentPasswordChangeController;
-use App\Http\Controllers\Auth\StudentForgotPasswordController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -22,15 +23,17 @@ Route::middleware('guest')->group(function () {
     Route::get('/', fn () => Inertia::render('Welcome'))->name('welcome');
 
     // Applicant routes
-    Route::get('/applicant/apply', [\App\Http\Controllers\Applicant\ApplicantController::class, 'create'])->name('applicant.apply');
-    Route::post('/applicant/apply', [\App\Http\Controllers\Applicant\ApplicantController::class, 'store'])->name('applicant.apply.store');
+    Route::get('/applicant/apply', [ApplicantController::class, 'create'])->name('applicant.apply');
+    Route::post('/applicant/apply', [ApplicantController::class, 'store'])->name('applicant.apply.store');
 
+    // Student routes
     Route::get('student/login', [StudentLoginController::class, 'create'])->name('student.login');
     Route::post('student/login', [StudentLoginController::class, 'store'])->name('student.login.store');
-    
+
     Route::get('student/forgot-password', [StudentForgotPasswordController::class, 'create'])->name('student.password.request');
     Route::post('student/forgot-password', [StudentForgotPasswordController::class, 'store'])->name('student.password.email');
 
+    // Admin routes
     Route::get('/admin/login', [AdminLoginController::class, 'create'])->name('admin.login');
     Route::post('/admin/login', [AdminLoginController::class, 'store'])->name('admin.login.store');
 
