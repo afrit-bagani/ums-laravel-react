@@ -191,7 +191,7 @@ class StudentProfileController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit(int $id)
     {
         $studentProfile = $this->studentRepo->getStudentWithRelationsById($id);
 
@@ -237,7 +237,7 @@ class StudentProfileController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateStudentProfileRequest $request, $id)
+    public function update(UpdateStudentProfileRequest $request, int $id)
     {
         $validated = $request->validated();
 

@@ -16,7 +16,7 @@ class StudentPaperSelectionController extends Controller
         $this->studentRepo = $studentRepo;
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
         $validated = $request->validate([
             'programme_id' => ['required', 'integer', Rule::exists('programme_master', 'programme_id')],
