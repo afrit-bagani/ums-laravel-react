@@ -2,7 +2,7 @@ import React from 'react';
 import { Head, router } from '@inertiajs/react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, GraduationCap, FileText, CreditCard, LogOut } from 'lucide-react';
+import { User, GraduationCap, FileText, CreditCard, LogOut, KeyRound } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useRoute } from 'ziggy-js';
 
@@ -20,9 +20,13 @@ export default function Dashboard({ student }) {
 
     const [activeTab, setActiveTab] = React.useState("basic-info");
 
-    const handleLogout = () => {
+    function handleChangePassword() {
+        router.get(route('student.password.change'));
+    }
+
+    function handleLogout() {
         router.post(route('student.logout'));
-    };
+    }
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -35,9 +39,14 @@ export default function Dashboard({ student }) {
                         <GraduationCap className="w-8 h-8 text-indigo-600" />
                         <h1 className="text-xl font-bold text-gray-900">Student Portal</h1>
                     </div>
-                    <Button variant="ghost" className="text-gray-500 hover:text-red-600 hover:bg-red-50" onClick={handleLogout}>
-                        <LogOut className="w-4 h-4 mr-2" /> Logout
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button variant="ghost" className="text-gray-500 hover:text-indigo-600 hover:bg-indigo-50" onClick={handleChangePassword}>
+                            <KeyRound className="w-4 h-4 mr-2" /> Change Password
+                        </Button>
+                        <Button variant="ghost" className="text-gray-500 hover:text-red-600 hover:bg-red-50" onClick={handleLogout}>
+                            <LogOut className="w-4 h-4 mr-2" /> Logout
+                        </Button>
+                    </div>
                 </div>
             </header>
 
@@ -210,9 +219,9 @@ export default function Dashboard({ student }) {
                                                 <h3 className="text-lg font-semibold text-green-900">Payment Successful</h3>
                                                 <p className="text-sm text-green-700">Your registration fee has been successfully processed.</p>
                                             </div>
-                                            <a 
-                                                href={route('student.payment.receipt')} 
-                                                target="_blank" 
+                                            <a
+                                                href={route('student.payment.receipt')}
+                                                target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg shadow-sm font-medium transition-colors flex items-center gap-2"
                                             >
