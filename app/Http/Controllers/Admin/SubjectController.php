@@ -7,7 +7,6 @@ use App\Repositories\Admin\SubjectRepository;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -58,9 +57,7 @@ class SubjectController extends Controller
 
     public function create()
     {
-        $programmesWithCourses = Cache::rememberForever('active_programmes_with_courses', function () {
-            return $this->subjectRepo->getActiveProgrammesAndCourses();
-        });
+        $programmesWithCourses = $this->subjectRepo->getActiveProgrammesAndCourses();
 
         return Inertia::render('Admin/Subjects/Create', [
             'programmes_with_courses' => $programmesWithCourses,
@@ -112,9 +109,7 @@ class SubjectController extends Controller
     {
         $subject = $this->subjectRepo->getSubjectById($id);
 
-        $programmesWithCourses = Cache::rememberForever('active_programmes_with_courses', function () {
-            return $this->subjectRepo->getActiveProgrammesAndCourses();
-        });
+        $programmesWithCourses = $this->subjectRepo->getActiveProgrammesAndCourses();
 
         return Inertia::render('Admin/Subjects/Edit', [
             'subject' => $subject,

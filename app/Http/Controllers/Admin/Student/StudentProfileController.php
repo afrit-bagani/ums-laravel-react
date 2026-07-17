@@ -10,7 +10,6 @@ use App\Repositories\Admin\StudentRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -69,7 +68,7 @@ class StudentProfileController extends Controller
      */
     public function create()
     {
-        $programmesWithCourses = Cache::remember('active_programmes_with_courses', 60 * 24, function () {
+        $programmesWithCourses = function () {
             $programmes = $this->studentRepo->getActiveProgrammes();
             $courses = $this->studentRepo->getActiveCourses();
 
@@ -91,11 +90,9 @@ class StudentProfileController extends Controller
             }
 
             return $result;
-        });
+        };
 
-        $batches = Cache::remember('active_batches', 60 * 24, function () {
-            return $this->studentRepo->getActiveBatches();
-        });
+        $batches = $this->studentRepo->getActiveBatches();
 
         return Inertia::render('Admin/Students/Create', [
             'programmes_with_courses' => $programmesWithCourses,
@@ -199,7 +196,7 @@ class StudentProfileController extends Controller
             abort(404, 'Student not found');
         }
 
-        $programmesWithCourses = Cache::remember('active_programmes_with_courses', 60 * 24, function () {
+        $programmesWithCourses = function () {
             $programmes = $this->studentRepo->getActiveProgrammes();
             $courses = $this->studentRepo->getActiveCourses();
 
@@ -221,11 +218,9 @@ class StudentProfileController extends Controller
             }
 
             return $result;
-        });
+        };
 
-        $batches = Cache::remember('active_batches', 60 * 24, function () {
-            return $this->studentRepo->getActiveBatches();
-        });
+        $batches = $this->studentRepo->getActiveBatches();
 
         return Inertia::render('Admin/Students/Edit', [
             'programmes_with_courses' => $programmesWithCourses,

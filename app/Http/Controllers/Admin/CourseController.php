@@ -7,7 +7,6 @@ use App\Repositories\Admin\CourseRepository;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -51,9 +50,7 @@ class CourseController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        $programmes = Cache::rememberForever('active_programmes', function () {
-            return $this->courseRepo->getActiveProgrammes();
-        });
+        $programmes = $this->courseRepo->getActiveProgrammes();
 
         return Inertia::render('Admin/Courses/Index', [
             'courses' => $paginator,

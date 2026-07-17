@@ -27,11 +27,6 @@ export default function ChangePassword() {
     e.preventDefault();
     post(route('student.password.update'), {
       preserveState: true,
-      // onSuccess: () => {
-      //   if (!isPasswordChanged) {
-      //     window.location.href = route('student.dashboard');
-      //   }
-      // }
     });
   };
 

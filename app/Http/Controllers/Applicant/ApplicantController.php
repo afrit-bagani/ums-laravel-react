@@ -5,10 +5,9 @@ namespace App\Http\Controllers\Applicant;
 use App\Http\Controllers\Controller;
 use App\Repositories\ApplicantRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
-use Illuminate\Support\Str;
 
 class ApplicantController extends Controller
 {
@@ -24,9 +23,7 @@ class ApplicantController extends Controller
      */
     public function create()
     {
-        $formData = Cache::rememberForever('applicant_form_data', function () {
-            return $this->applicantRepo->getFormData();
-        });
+        $formData = $this->applicantRepo->getFormData();
 
         return Inertia::render('Applicant/Apply', [
             'programmes_with_courses' => $formData['programmes_with_courses'],
@@ -112,7 +109,7 @@ class ApplicantController extends Controller
         $validated = $request->validate(array_merge($profileRules, $paperRules, $documentRules, $paymentRules));
 
         // Generate Unique Applicant Code: APP-YYYY-RANDOM
-        $applicantCode = 'APP-' . date('Y') . '-' . strtoupper(Str::random(6));
+        $applicantCode = 'APP-'.date('Y').'-'.strtoupper(Str::random(6));
 
         // Upload Documents
         $photoPath = $request->file('photo')->store('applicants/photos', 'public');
@@ -121,14 +118,14 @@ class ApplicantController extends Controller
         // Extract validated data sets
         $profileData = $request->only(array_keys($profileRules));
         $profileData['applicant_code'] = $applicantCode;
-        
+
         $paperSelectionData = $request->only(array_keys($paperRules));
-        
+
         $documentData = [
             'photo_path' => $photoPath,
             'signature_path' => $signaturePath,
         ];
-        
+
         $paymentData = $request->only(array_keys($paymentRules));
 
         // Store via Repository (Wrapped in DB Transaction inside repo)
@@ -136,7 +133,7 @@ class ApplicantController extends Controller
 
         return back()->with([
             'success' => 'Application submitted successfully!',
-            'applicant_code' => $applicantCode
+            'applicant_code' => $applicantCode,
         ]);
     }
 }

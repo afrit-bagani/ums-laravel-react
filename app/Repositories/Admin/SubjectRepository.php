@@ -83,7 +83,7 @@ class SubjectRepository
     public function getActiveProgrammesAndCourses()
     {
         $programmes = DB::select("SELECT programme_id, name as programme_name FROM programme_master WHERE status = 'active'");
-        $courses = DB::select("SELECT course_id, programme_id, name as course_name FROM course_master WHERE status = 'active'");
+        $courses = DB::select("SELECT course_id, programme_id, CONCAT(code, ' - ',  name) as course_name FROM course_master WHERE status = 'active' ORDER BY created_at DESC");
 
         $groupedCourses = [];
         foreach ($courses as $course) {
