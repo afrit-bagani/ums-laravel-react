@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Applicant;
 
 use App\Http\Controllers\Controller;
 use App\Repositories\ApplicantRepository;
+use App\Services\AiDocumentValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -34,7 +35,7 @@ class ApplicantController extends Controller
     /**
      * Store the applicant registration data.
      */
-    public function store(Request $request)
+    public function store(Request $request, AiDocumentValidator $aiValidator)
     {
         // 1. Validate Profile Data
         $profileRules = [
@@ -105,15 +106,21 @@ class ApplicantController extends Controller
             'payment_date' => ['nullable', 'date'],
         ];
 
-        // Merge all rules and validate
-        $validated = $request->validate(array_merge($profileRules, $paperRules, $documentRules, $paymentRules));
+        // Merge all rules and run validation (throws exception if fails)
+        $request->validate(array_merge($profileRules, $paperRules, $documentRules, $paymentRules));
+
+        $photo = $request->file('photo');
+        $signature = $request->file('signature');
+
+        $aiValidator->validatePassport($photo);
+        $aiValidator->validateSignature($signature);
 
         // Generate Unique Applicant Code: APP-YYYY-RANDOM
         $applicantCode = 'APP-'.date('Y').'-'.strtoupper(Str::random(6));
 
         // Upload Documents
-        $photoPath = $request->file('photo')->store('applicants/photos', 'public');
-        $signaturePath = $request->file('signature')->store('applicants/signatures', 'public');
+        $photoPath = $photo->store('applicants/photos', 'public');
+        $signaturePath = $signature->store('applicants/signatures', 'public');
 
         // Extract validated data sets
         $profileData = $request->only(array_keys($profileRules));

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Student;
 
 use App\Http\Controllers\Controller;
 use App\Repositories\Admin\StudentRepository;
+use App\Services\AiDocumentValidator;
 use Illuminate\Http\Request;
 
 class StudentDocumentController extends Controller
@@ -15,7 +16,7 @@ class StudentDocumentController extends Controller
         $this->studentRepo = $studentRepo;
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id, AiDocumentValidator $aiValidator)
     {
         $request->validate([
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
@@ -26,13 +27,21 @@ class StudentDocumentController extends Controller
         $bindings = [];
 
         if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('documents', 'public');
+            $photo = $request->file('photo');
+
+            $aiValidator->validatePassport($photo);
+
+            $photoPath = $photo->store('documents', 'public');
             $updates[] = 'photo_path = ?';
             $bindings[] = $photoPath;
         }
 
         if ($request->hasFile('signature')) {
-            $signaturePath = $request->file('signature')->store('documents', 'public');
+            $signature = $request->file('signature');
+
+            $aiValidator->validateSignature($signature);
+
+            $signaturePath = $signature->store('documents', 'public');
             $updates[] = 'signature_path = ?';
             $bindings[] = $signaturePath;
         }

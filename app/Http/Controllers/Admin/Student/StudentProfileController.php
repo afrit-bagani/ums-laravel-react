@@ -7,6 +7,7 @@ use App\Http\Requests\CreateStudentProfileRequest;
 use App\Http\Requests\UpdateStudentProfileRequest;
 use App\Mail\StudentWelcomeEmail;
 use App\Repositories\Admin\StudentRepository;
+use App\Services\AiDocumentValidator;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -103,9 +104,15 @@ class StudentProfileController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CreateStudentProfileRequest $request)
+    public function store(CreateStudentProfileRequest $request, AiDocumentValidator $aiValidator)
     {
         $validated = $request->validated();
+
+        $photo = $request->file('photo');
+        $signature = $request->file('signature');
+
+        $aiValidator->validatePassport($photo);
+        $aiValidator->validateSignature($signature);
 
         try {
             DB::transaction(function () use ($request, $validated) {
