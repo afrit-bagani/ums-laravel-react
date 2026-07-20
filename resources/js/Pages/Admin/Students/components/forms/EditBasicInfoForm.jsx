@@ -56,9 +56,6 @@ export default function EditBasicInfoForm({ studentProfile }) {
     if (e) e.preventDefault();
     patch(route('admin.students.update', { id: studentProfile.id }), {
       preserveScroll: true,
-      onSuccess: () => {
-        alert("Basic Information updated successfully!");
-      },
     });
   };
 

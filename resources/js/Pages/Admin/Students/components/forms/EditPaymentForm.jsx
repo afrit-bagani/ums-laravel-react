@@ -18,9 +18,6 @@ export default function EditPaymentForm({ studentProfile }) {
     if (e) e.preventDefault();
     patch(route('admin.students.payments.update', { id: studentProfile.id }), {
       preserveScroll: true,
-      onSuccess: () => {
-        alert("Payment details updated successfully!");
-      },
     });
   };
 

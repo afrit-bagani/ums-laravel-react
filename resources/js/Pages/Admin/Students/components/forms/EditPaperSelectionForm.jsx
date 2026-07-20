@@ -16,9 +16,6 @@ export default function EditPaperSelectionForm({ studentProfile, programmes_with
     if (e) e.preventDefault();
     patch(route('admin.students.papers.update', { id: studentProfile.id }), {
       preserveScroll: true,
-      onSuccess: () => {
-        alert("Academic Placement updated successfully!");
-      },
     });
   };
 

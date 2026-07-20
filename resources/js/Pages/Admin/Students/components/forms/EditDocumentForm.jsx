@@ -9,25 +9,22 @@ export default function EditDocumentForm({ studentProfile }) {
   const { data, setData, post, processing, errors } = useForm({
     photo: studentProfile?.photo || null,
     signature: studentProfile?.signature || null,
-    _method: 'patch', // Inertia workaround for file uploads with PATCH
+    _method: 'patch', // Required for file uploads in Laravel
   });
 
   const handleSubmit = (e) => {
     if (e) e.preventDefault();
     post(route('admin.students.documents.update', { id: studentProfile.id }), {
       preserveScroll: true,
-      onSuccess: () => {
-        alert("Documents updated successfully!");
-      },
     });
   };
 
   return (
     <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-8">
-      <CreateDocumentForm 
-        data={data} 
-        setData={setData} 
-        errors={errors} 
+      <CreateDocumentForm
+        data={data}
+        setData={setData}
+        errors={errors}
         onNext={handleSubmit}
         buttonLabel="Update Documents"
         processing={processing}
