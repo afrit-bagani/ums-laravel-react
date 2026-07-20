@@ -37,7 +37,7 @@ export default function VerifyOtp({ login_identifier }) {
                         <Logo text="Admin Portal" />
                     </div>
                     <div className="flex flex-1 items-center justify-center">
-                        <div className="w-full max-w-xs">
+                        <div className="w-full max-w-sm rounded-2xl border bg-card/50 text-card-foreground shadow-xl p-8 backdrop-blur-sm">
                             <form className="flex flex-col gap-6" onSubmit={submit}>
                                 <div className="flex flex-col items-center gap-2 text-center">
                                     <h1 className="text-2xl font-bold">Verify OTP</h1>
