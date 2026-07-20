@@ -32,6 +32,10 @@ Route::middleware('guest')->group(function () {
 
     Route::get('student/forgot-password', [StudentForgotPasswordController::class, 'create'])->name('student.password.request');
     Route::post('student/forgot-password', [StudentForgotPasswordController::class, 'store'])->name('student.password.email');
+    Route::get('student/verify-otp', [StudentForgotPasswordController::class, 'showVerifyOtp'])->name('student.password.verify');
+    Route::post('student/verify-otp', [StudentForgotPasswordController::class, 'verifyOtp'])->name('student.password.verify.store');
+    Route::get('student/reset-password', [StudentForgotPasswordController::class, 'showResetPassword'])->name('student.password.reset');
+    Route::post('student/reset-password', [StudentForgotPasswordController::class, 'resetPassword'])->name('student.password.reset.store');
 
     // Admin routes
     Route::get('/admin/login', [AdminLoginController::class, 'create'])->name('admin.login');
@@ -39,6 +43,10 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/admin/forgot-password', [AdminForgotPasswordController::class, 'create'])->name('admin.password.request');
     Route::post('/admin/forgot-password', [AdminForgotPasswordController::class, 'store'])->name('admin.password.email');
+    Route::get('/admin/verify-otp', [AdminForgotPasswordController::class, 'showVerifyOtp'])->name('admin.password.verify');
+    Route::post('/admin/verify-otp', [AdminForgotPasswordController::class, 'verifyOtp'])->name('admin.password.verify.store');
+    Route::get('/admin/reset-password', [AdminForgotPasswordController::class, 'showResetPassword'])->name('admin.password.reset');
+    Route::post('/admin/reset-password', [AdminForgotPasswordController::class, 'resetPassword'])->name('admin.password.reset.store');
 });
 
 Route::middleware(['auth', 'can:access-admin-panel'])->group(function () {

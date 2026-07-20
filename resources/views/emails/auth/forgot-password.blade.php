@@ -89,15 +89,15 @@
         
         <p>We received a request to reset the password for your account.</p>
         
-        <p>A new temporary password has been generated for you. <strong>For your security, you will be required to change this password immediately upon logging in.</strong></p>
+        <p>Your 6-digit One Time Password (OTP) has been generated for you. <strong>For your security, this code will expire in 15 minutes.</strong></p>
 
         <div class="credentials-box">
             <p><strong>Login ID:</strong> {{ $loginIdentifier }}</p>
-            <p><strong>Temporary Password:</strong> {{ $temporaryPassword }}</p>
+            <p style="font-size: 24px; text-align: center; font-weight: bold; margin: 15px 0;"><strong>{{ $otp }}</strong></p>
         </div>
 
         <div class="button-container">
-            <a href="{{ $loginRoute }}" class="login-button">Log In Now</a>
+            <p>Please return to the application and enter this code to reset your password.</p>
         </div>
         
         <p>If you did not request a password reset, please contact the administration immediately.</p>

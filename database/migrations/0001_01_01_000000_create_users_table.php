@@ -19,6 +19,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('is_password_changed')->default(false);
+            $table->string('reset_otp')->nullable();
+            $table->timestamp('reset_otp_expires_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

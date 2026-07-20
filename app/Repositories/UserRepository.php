@@ -35,7 +35,29 @@ class UserRepository
     {
         return DB::update(
             'UPDATE users SET password = ?, is_password_changed = ?, updated_at = ? WHERE id = ?',
-            [$hashedPassword, $isPasswordChanged, now(), $userId]
+            [$hashedPassword, (int)$isPasswordChanged, now(), $userId]
+        );
+    }
+
+    /**
+     * Save the password reset OTP for a user.
+     */
+    public function saveResetOtp(int $userId, string $otp, string $expiresAt)
+    {
+        return DB::update(
+            'UPDATE users SET reset_otp = ?, reset_otp_expires_at = ?, updated_at = ? WHERE id = ?',
+            [$otp, $expiresAt, now(), $userId]
+        );
+    }
+
+    /**
+     * Clear the password reset OTP for a user after successful verification.
+     */
+    public function clearResetOtp(int $userId)
+    {
+        return DB::update(
+            'UPDATE users SET reset_otp = NULL, reset_otp_expires_at = NULL, updated_at = ? WHERE id = ?',
+            [now(), $userId]
         );
     }
 }

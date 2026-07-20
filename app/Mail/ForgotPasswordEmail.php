@@ -14,17 +14,17 @@ class ForgotPasswordEmail extends Mailable
 
     public $name;
     public $loginIdentifier;
-    public $temporaryPassword;
+    public $otp;
     public $loginRoute;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($name, $loginIdentifier, $temporaryPassword, $loginRoute)
+    public function __construct($name, $loginIdentifier, $otp, $loginRoute)
     {
         $this->name = $name;
         $this->loginIdentifier = $loginIdentifier;
-        $this->temporaryPassword = $temporaryPassword;
+        $this->otp = $otp;
         $this->loginRoute = $loginRoute;
     }
 
@@ -34,7 +34,7 @@ class ForgotPasswordEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your Password Has Been Reset - UMS',
+            subject: 'Your Password Reset OTP - UMS',
         );
     }
 

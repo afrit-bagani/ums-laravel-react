@@ -34,7 +34,7 @@ export default function ForgotPassword() {
                                 <div className="flex flex-col items-center gap-2 text-center">
                                     <h1 className="text-2xl font-bold">Forgot Password</h1>
                                     <p className="text-sm text-balance text-muted-foreground">
-                                        Enter your registration number to receive a new temporary password.
+                                        Enter your registration number to receive a 6-digit OTP to reset your password.
                                     </p>
                                 </div>
                                 <FieldGroup>
@@ -55,7 +55,7 @@ export default function ForgotPassword() {
 
                                     <Field>
                                         <Button type="submit" disabled={processing}>
-                                            {processing ? 'Sending...' : 'Reset Password'}
+                                            {processing ? 'Sending OTP...' : 'Send OTP'}
                                         </Button>
                                     </Field>
                                 </FieldGroup>
