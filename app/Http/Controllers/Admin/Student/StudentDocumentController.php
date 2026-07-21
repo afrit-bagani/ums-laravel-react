@@ -25,25 +25,50 @@ class StudentDocumentController extends Controller
 
         $updates = [];
         $bindings = [];
+        $errors = [];
 
         if ($request->hasFile('photo')) {
             $photo = $request->file('photo');
+            $photoResult = $aiValidator->validatePassport($photo);
 
-            $aiValidator->validatePassport($photo);
-
-            $photoPath = $photo->store('documents', 'public');
-            $updates[] = 'photo_path = ?';
-            $bindings[] = $photoPath;
+            if (!$photoResult['is_valid']) {
+                $errors['photo'] = $photoResult['errors'];
+            } else {
+                $photoHash = $photoResult['hash'];
+                if ($this->studentRepo->checkDocumentHashExists($photoHash)) {
+                    $errors['photo'] = ['This passport photo has already been uploaded by another student.'];
+                } else {
+                    $photoPath = $photo->store('documents', 'public');
+                    $updates[] = 'photo_path = ?';
+                    $bindings[] = $photoPath;
+                    $updates[] = 'photo_hash = ?';
+                    $bindings[] = $photoHash;
+                }
+            }
         }
 
         if ($request->hasFile('signature')) {
             $signature = $request->file('signature');
+            $signatureResult = $aiValidator->validateSignature($signature);
 
-            $aiValidator->validateSignature($signature);
+            if (!$signatureResult['is_valid']) {
+                $errors['signature'] = $signatureResult['errors'];
+            } else {
+                $signatureHash = $signatureResult['hash'];
+                if ($this->studentRepo->checkDocumentHashExists($signatureHash)) {
+                    $errors['signature'] = ['This signature has already been uploaded by another student.'];
+                } else {
+                    $signaturePath = $signature->store('documents', 'public');
+                    $updates[] = 'signature_path = ?';
+                    $bindings[] = $signaturePath;
+                    $updates[] = 'signature_hash = ?';
+                    $bindings[] = $signatureHash;
+                }
+            }
+        }
 
-            $signaturePath = $signature->store('documents', 'public');
-            $updates[] = 'signature_path = ?';
-            $bindings[] = $signaturePath;
+        if (!empty($errors)) {
+            throw \Illuminate\Validation\ValidationException::withMessages($errors);
         }
 
         if (! empty($updates)) {

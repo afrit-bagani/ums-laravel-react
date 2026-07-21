@@ -16,6 +16,19 @@ export default function EditDocumentForm({ studentProfile }) {
     if (e) e.preventDefault();
     post(route('admin.students.documents.update', { id: studentProfile.id }), {
       preserveScroll: true,
+      transform: (data) => {
+        const payload = { _method: 'patch' };
+        
+        // Only send the property if the user actually selected a new file
+        if (data.photo instanceof File) {
+          payload.photo = data.photo;
+        }
+        if (data.signature instanceof File) {
+          payload.signature = data.signature;
+        }
+        
+        return payload;
+      },
     });
   };
 

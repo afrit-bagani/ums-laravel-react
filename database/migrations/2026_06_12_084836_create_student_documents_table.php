@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('student_documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('student_profile_id')->constrained('student_profiles')->cascadeOnDelete();
-            $table->string('photo_path');
-            $table->string('signature_path');
+            $table->string('photo_path')->nullable();
+            $table->string('photo_hash')->nullable();
+            $table->string('signature_path')->nullable();
+            $table->string('signature_hash')->nullable();
             $table->timestamps();
         });
     }

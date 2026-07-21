@@ -204,12 +204,25 @@ class StudentRepository
     /**
      * Create a student document record.
      */
-    public function createStudentDocument(int $studentId, string $photoPath, string $signaturePath, string $createdAt, string $updatedAt)
+    public function createStudentDocument(int $studentId, ?string $photoPath, ?string $photoHash, ?string $signaturePath, ?string $signatureHash, string $createdAt, string $updatedAt)
     {
         DB::insert(
-            'INSERT INTO student_documents (student_profile_id, photo_path, signature_path, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
-            [$studentId, $photoPath, $signaturePath, $createdAt, $updatedAt]
+            'INSERT INTO student_documents (student_profile_id, photo_path, photo_hash, signature_path, signature_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [$studentId, $photoPath, $photoHash, $signaturePath, $signatureHash, $createdAt, $updatedAt]
         );
+    }
+
+    /**
+     * Check if a document hash already exists in the system to prevent duplicates.
+     */
+    public function checkDocumentHashExists(string $hash): bool
+    {
+        $exists = DB::selectOne(
+            'SELECT 1 FROM student_documents WHERE photo_hash = ? OR signature_hash = ? LIMIT 1',
+            [$hash, $hash]
+        );
+        
+        return $exists !== null;
     }
 
     /**

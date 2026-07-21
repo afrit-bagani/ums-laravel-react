@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class StudentProfileController extends Controller
@@ -111,11 +112,40 @@ class StudentProfileController extends Controller
         $photo = $request->file('photo');
         $signature = $request->file('signature');
 
-        $aiValidator->validatePassport($photo);
-        $aiValidator->validateSignature($signature);
+        $errors = [];
+        $photoHash = null;
+        $signatureHash = null;
+
+        if ($photo) {
+            $photoResult = $aiValidator->validatePassport($photo);
+            if (! $photoResult['is_valid']) {
+                $errors['photo'] = $photoResult['errors'];
+            } else {
+                $photoHash = $photoResult['hash'];
+                if ($this->studentRepo->checkDocumentHashExists($photoHash)) {
+                    $errors['photo'] = ['This passport photo has already been uploaded by another student.'];
+                }
+            }
+        }
+
+        if ($signature) {
+            $signatureResult = $aiValidator->validateSignature($signature);
+            if (! $signatureResult['is_valid']) {
+                $errors['signature'] = $signatureResult['errors'];
+            } else {
+                $signatureHash = $signatureResult['hash'];
+                if ($this->studentRepo->checkDocumentHashExists($signatureHash)) {
+                    $errors['signature'] = ['This signature has already been uploaded by another student.'];
+                }
+            }
+        }
+
+        if (! empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
 
         try {
-            DB::transaction(function () use ($request, $validated) {
+            DB::transaction(function () use ($request, $validated, $photoHash, $signatureHash) {
                 $createdAt = now()->toDateTimeString();
                 $updatedAt = now()->toDateTimeString();
 
@@ -154,10 +184,10 @@ class StudentProfileController extends Controller
                 $this->studentRepo->createStudentPaperSelection($studentId, $validated['programme_id'], $validated['course_id'], $validated['batch_id'], $createdAt, $updatedAt);
 
                 // 5. Store Documents and Insert into student_documents
-                $photoPath = $request->file('photo')->store('documents', 'public');
-                $signaturePath = $request->file('signature')->store('documents', 'public');
+                $photoPath = $request->hasFile('photo') ? $request->file('photo')->store('documents', 'public') : null;
+                $signaturePath = $request->hasFile('signature') ? $request->file('signature')->store('documents', 'public') : null;
 
-                $this->studentRepo->createStudentDocument($studentId, $photoPath, $signaturePath, $createdAt, $updatedAt);
+                $this->studentRepo->createStudentDocument($studentId, $photoPath, $photoHash, $signaturePath, $signatureHash, $createdAt, $updatedAt);
 
                 // 6. Insert into student_payments
                 $this->studentRepo->createStudentPayment($studentId, $validated, $createdAt, $updatedAt);
