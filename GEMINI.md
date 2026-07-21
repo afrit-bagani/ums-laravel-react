@@ -382,3 +382,18 @@ This file tracks the ongoing features, refactoring, and UI enhancements made to 
 - **Seamless UI Integration:** Because the raw SQL automatically aliases the formatted string as `batch_name`, the Inertia frontend (`StudentTable.jsx` and `<Select>` dropdowns) instantly adopted the new "Code - Name" format without requiring a single JavaScript modification.
 - **Cache Management:** Executed manual cache purges (Cache::forget('active_batches')) to ensure the updated dropdown formatting propagated immediately across the system.
 - **Student Dashboard Links:** Expanded the Student Dashboard header to include a native Change Password link routing seamlessly to the internal auth-settings portal.
+
+## [2026-07-21] AI Document Validation & Hash Deduplication
+
+### 🤖 AI Microservice Integration
+- **Python FastAPI Service:** Integrated an external Python AI microservice (running via FastAPI) to perform semantic validation on uploaded student documents. The service leverages Hugging Face Transformers (`openai/clip-vit-base-patch32`) for image classification (e.g., verifying if an image is actually a passport photo) and EasyOCR for extracting text from handwritten signatures.
+- **AiDocumentValidator Service:** Built a dedicated Laravel Service class (`AiDocumentValidator`) that utilizes the `Http` facade to send multi-part form payloads (`$photo->getPathname()`) directly to the Python endpoints. It implements robust exception handling to return safe, structured arrays indicating validation success or failure, alongside human-readable error messages.
+
+### 🛡️ Duplicate Prevention & Hashing
+- **Perceptual Hashing (pHash):** Implemented perceptual image hashing within the Python microservice using the `imagehash` library. This generates a unique 64-bit hex hash string for the visual content of every uploaded image.
+- **Database Schema Upgrades:** Added `photo_hash` and `signature_hash` string columns to both the `student_documents` and `applicant_documents` tables.
+- **Cross-Student Collision Detection:** Implemented `checkDocumentHashExists` in the `StudentRepository`. The backend controllers (`StudentProfileController@store` and `StudentDocumentController@update`) now intercept the hash returned by the AI service and query the database. If the hash exists, it throws a strict validation error (`This passport photo has already been uploaded by another student`), completely preventing students from uploading identical documents.
+
+### ⚙️ Frontend & Controller Enhancements
+- **Piecemeal Document Updates:** Refactored `EditDocumentForm.jsx` to dynamically build its Inertia `patch` payload. Utilizing the `transform` callback and `instanceof File` checks, the form strips out unchanged string URLs, guaranteeing that the backend only receives actual binary files during targeted updates.
+- **Aggregated AI Errors:** Restructured `StudentDocumentController@update` to manually construct a `$errors` array by checking both the photo and signature results independently. If any AI validation fails, it throws a unified `\Illuminate\Validation\ValidationException::withMessages($errors)`, allowing both errors to display simultaneously in the React frontend without blocking one another.

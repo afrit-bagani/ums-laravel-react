@@ -1,72 +1,98 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# University Management System (UMS)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Overview
+A comprehensive, state-of-the-art University/College Management System designed to handle the entire lifecycle of students, from applicant registration to full enrollment. The system features strict role-based access for Admins, Applicants, and Students, complete with a robust AI-powered document verification system for automated passport photo and signature validation.
 
-## About Laravel
+## Tech Stack
+- **Backend**: Laravel (PHP 8.3+)
+- **Frontend**: React 19, Inertia.js
+- **Styling & UI**: Tailwind CSS v4, Shadcn UI components
+- **Database**: MySQL (optimized with raw SQL for maximum performance)
+- **AI Microservice**: Python FastAPI, Hugging Face Transformers (CLIP), EasyOCR, ImageHash
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Key Features
+- **Admin Dashboard**: Sleek, high-performance data tables with bulk actions, sorting, and filtering for Batches, Programmes, Courses, and Subjects.
+- **Applicant Portal**: A secure, public-facing multi-step registration wizard with automated `APP-YYYY-XXXX` code generation and atomic database transactions.
+- **Student Enrollment**: Complete admission workflow tracking basic info, academic placements, uploaded documents, and payment details across fully normalized database tables.
+- **AI Document Verification**: Real-time evaluation of uploaded passport photos and handwritten signatures utilizing a local Python microservice. Validates semantic content and prevents duplicate image uploads via perceptual hashing (`pHash`).
+- **Student Dashboard**: Secure read-only portal for enrolled students to view their profile, academic details, and download generated PDF payment receipts (via `dompdf`).
+- **Automated Email & Security**: SMTP-powered welcome emails with auto-generated temporary passwords. The system forces a mandatory password change on the first login via custom middleware.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Setup Instructions
 
-## Learning Laravel
+### Prerequisites
+- **PHP 8.3+** (Laravel Herd recommended for Windows)
+- **Composer**
+- **Node.js & npm**
+- **MySQL**
+- **Python 3.10+** (for the AI Microservice)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
+### 1. Application Setup
+Clone the repository and install the backend and frontend dependencies:
 ```bash
-composer require laravel/boost --dev
+# Install PHP dependencies
+composer install
 
-php artisan boost:install
+# Install NPM dependencies
+npm install
+
+# Setup environment variables
+cp .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Configure your `.env` file with your local database and mail credentials:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=dcg_ums
+DB_USERNAME=root
+DB_PASSWORD=admin
 
-## Contributing
+AI_MICROSERVICE_URL="http://127.0.0.1:8000"
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=465
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_ENCRYPTION=ssl
+MAIL_FROM_ADDRESS=your-email@gmail.com
+MAIL_FROM_NAME="${APP_NAME}"
+```
 
-## Code of Conduct
+### 2. Database Migration & Seeding
+The project comes with a comprehensive seeding architecture that populates related tables with realistic data.
+```bash
+# Run migrations and populate mock data
+php artisan migrate:fresh --seed
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 3. AI Document Microservice Setup
+The AI Microservice validates images locally using open-source models to ensure privacy.
+```bash
+# Set up a Python virtual environment
+python -m venv .venv
+venv\Scripts\activate
 
-## Security Vulnerabilities
+# Install the required Python packages
+pip install fastapi uvicorn Pillow imagehash easyocr transformers python-dotenv
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Run the FastAPI server
+python -m uvicorn main:app --reload
+```
+*(Ensure the microservice is running before attempting to upload documents in the Laravel app.)*
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-src/
- └── components/
-      └── AdmissionForm/
-           ├── AdmissionForm.tsx          <-- The Parent (Holds the tabs and the state)
-           ├── tabs/
-           │    ├── BasicInformationTab.tsx
-           │    ├── PaperSelectionTab.tsx
-           │    └── ...
-           └── sections/
-                ├── PersonalInfoSection.tsx
-                ├── AddressSection.tsx
-                ├── PreviousExamSection.tsx
-                └── DocumentUploadSection.tsx
+### 4. Running the Project
+Start the Vite development server to compile your React components:
+```bash
+npm run dev
+```
+If you are not using Laravel Herd, also start the PHP development server:
+```bash
+php artisan serve
+```
+You can now access the application at `http://ums.test` (or `http://localhost:8000`).
